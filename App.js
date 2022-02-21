@@ -29,6 +29,8 @@ import SplashScreen from './src/component/SplashScreen/SplashScreen';
 import GenerateQr from './src/component/MakeQr';
 import ScanQr from './src/component/ScanQr';
 import GeneratedQr from './src/component/ViewGeneratedQrScreen';
+import BusAndDriverInfo from './src/component/BusAndDriverInfo';
+import ReportBoardScreen from './src/component/ReportBoardScreen';
 
 const App: () => Node = () => {
   const isDarkMode = useColorScheme() === 'dark';
@@ -113,6 +115,16 @@ const App: () => Node = () => {
               name="GeneratedQr"
               component={GeneratedQr}
               options={{title: 'GeneratedQr'}}
+            />
+            <Stack.Screen
+              name="BusAndDriverInfo"
+              component={BusAndDriverInfo}
+              options={{title: 'BusAndDriverInfo'}}
+            />
+            <Stack.Screen
+              name="ReportBoardScreen"
+              component={ReportBoardScreen}
+              options={{title: 'ReportBoardScreen'}}
             />
           </>
         ) : (

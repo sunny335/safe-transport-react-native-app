@@ -18,13 +18,20 @@ import {
   Linking,
   TouchableOpacity,
   AppRegistry,
+  Pressable,
 } from 'react-native';
+import {Picker} from '@react-native-picker/picker';
+import CheckBox from '@react-native-community/checkbox';
 import {t} from 'react-native-tailwindcss';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import {RNCamera} from 'react-native-camera';
+import {useForm, Controller} from 'react-hook-form';
 import {useDispatch, useSelector} from 'react-redux';
-import {getPosts} from '../actions';
+import InputBox from '../CommentBox';
 import image1 from '../image/loginBg.png';
+import {launchImageLibrary} from 'react-native-image-picker';
+import {updatePost, getPosts} from '../actions';
+import {CreateReport} from '../actions/report.action';
 // import profile from '../image/profile.jpg';
 import avatar from '../image/avatar.png';
 import DoubleRight from '../image/DoubleRight.png';
@@ -35,15 +42,27 @@ import QrCode from '../image/QrCode.png';
 
 const HEIGHT = Dimensions.get('window').height;
 
-const ScanQrCode = ({navigation}) => {
+const ReportBoardScreen = ({navigation}) => {
+  const {
+    handleSubmit,
+    control,
+    formState: {errors},
+  } = useForm();
   // const userauth = useSelector(state => state.userAuth);
   const posts = useSelector(state => state.posts);
+  const [selectedValue, setSelectedValue] = useState('Over Speed');
+  const [isCheck, setCheck] = useState(false);
   const [loggedIn, setLoggedIn] = useState({});
+  const [scannedQr, setscanQr] = useState(false);
   const [qrCodeData, setqrCodeData] = useState(null);
   const isDarkMode = useColorScheme() === 'dark';
   const dispatch = useDispatch();
   const [QrData, setQrData] = useState({posts: []});
   const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const [BusownerImage, setBusownerImage] = useState({
+    avatarSource: null,
+    imgBase64: [],
+  });
   const backgroundStyle = {
     backgroundColor: isDarkMode ? '#ffff' : '#ffff',
   };
@@ -62,18 +81,11 @@ const ScanQrCode = ({navigation}) => {
     setQrData(posts.posts);
   }, []);
 
-  // const onSuccess = e => {
-  //   Linking.openURL(e.data).catch(err =>
-  //     console.error('An error occured', err),
-  //   );
-  // };
-
   //get  keyboard data
 
   function onKeyboardDidShow(e: KeyboardEvent) {
     setKeyboardHeight(e.endCoordinates.height);
   }
-
   function onKeyboardDidHide() {
     setKeyboardHeight(0);
   }
@@ -104,6 +116,11 @@ const ScanQrCode = ({navigation}) => {
     };
     // DriverInfo.driverName = splitQrdata[3]?.split(':');
   }
+  useEffect(() => {
+    if (qrCodeData?.data) {
+      setscanQr(false);
+    }
+  }, [qrCodeData]);
 
   useEffect(() => {
     if (DriverInfo.busNumber !== null) {
@@ -126,7 +143,77 @@ const ScanQrCode = ({navigation}) => {
     DriverInfo?.busNumber &&
     QrData?.posts.filter(item => item.busNumber == DriverInfo?.busNumber[1]);
   // console.log('==============', QrbackendData);
-  let mainContainerHeight = HEIGHT - 390;
+
+  // photo seleact
+  const selectPhotoTapped = () => {
+    const options = {
+      quality: 0.75,
+      maxWidth: 300,
+      maxHeight: 300,
+      includeBase64: true,
+      storageOptions: {
+        skipBackup: true,
+      },
+    };
+    // launchImageLibrary(options);
+    launchImageLibrary(options, response => {
+      // console.log('Response = ', response);
+
+      if (response.didCancel) {
+        console.log('User cancelled photo picker');
+      } else if (response.error) {
+        console.log('ImagePicker Error: ', response.error);
+      } else if (response.customButton) {
+        console.log('User tapped custom button: ', response.customButton);
+      } else {
+        let source;
+        // You can display the image using either:
+        // console.log('source', response.assets[0].base64);
+        source = {
+          uri: 'data:image/jpeg;base64,' + response.assets[0].base64,
+          isStatic: true,
+        };
+
+        const temp = response.assets[0].base64;
+
+        //Or:
+        if (Platform.OS === 'android') {
+          source = {uri: response.uri, isStatic: true};
+        } else {
+          source = {uri: response.uri.replace('file://', ''), isStatic: true};
+        }
+        // file
+        var base64Selected = `data:image/png;base64,${response.assets[0].base64}`;
+        setBusownerImage({
+          avatarSource: base64Selected,
+          imgBase64: temp,
+        });
+      }
+    });
+  };
+
+  // form submit
+
+  const onSubmit = data => {
+    console.log(data, ' Report Data==========');
+    // ReportType:selectedValue,
+    // isCheck
+    // reportedPhoto: BusownerImage.avatarSource,
+    // ReportedBusInfo:QrbackendData,
+    if (QrbackendData?.length > 0) {
+      dispatch(
+        CreateReport({
+          ...data,
+          ReporterID: loggedIn.user._id,
+          ReportedBusInfo: QrbackendData,
+          reportedPhoto: BusownerImage.avatarSource,
+          ReportType: selectedValue,
+        }),
+      );
+    }
+  };
+
+  let mainContainerHeight = HEIGHT - (320 + keyboardHeight);
 
   return (
     <View
@@ -227,7 +314,7 @@ const ScanQrCode = ({navigation}) => {
           maxHeight: mainContainerHeight,
         }}>
         <ScrollView>
-          {qrCodeData?.data ? (
+          {!scannedQr ? (
             <View>
               <Text
                 style={{
@@ -235,9 +322,19 @@ const ScanQrCode = ({navigation}) => {
                   fontSize: 18,
                   fontWeight: '700',
                   color: '#263238',
+                }}>
+                Report Board
+              </Text>
+              <Text
+                style={{
+                  textAlign: 'center',
+                  fontSize: 14,
+                  fontWeight: '400',
+                  color: '#5C5F69',
                   marginBottom: 20,
                 }}>
-                Bus & Driver Info
+                If you have facing any problem? Report this, we will take action
+                as soon.
               </Text>
             </View>
           ) : (
@@ -252,11 +349,11 @@ const ScanQrCode = ({navigation}) => {
                 Scan QR Code
               </Text>
               <Text style={{textAlign: 'center', color: '#263238'}}>
-                You sacn code for more detailes.
+                You scan code for more details.
               </Text>
               <Text style={{textAlign: 'center', color: '#263238'}}>
                 {' '}
-                Then you can include this info in repot section.
+                Then you can include this info in report section.
               </Text>
             </View>
           )}
@@ -278,220 +375,269 @@ const ScanQrCode = ({navigation}) => {
                   paddingVertical: 20,
                   marginBottom: 30,
                 }}>
-                {qrCodeData?.data ? (
+                {!scannedQr ? (
                   <View>
-                    {QrbackendData.length > 0 &&
-                      QrbackendData.map(items => (
-                        <View
-                          style={[
-                            t.flexRow,
-                            t.flex,
-                            t.wFull,
-                            // t.selfStretch,
-                            t.itemsCenter,
-                            t.justifyCenter,
-                          ]}>
-                          {items.TravelChart !== null ? (
-                            <View>
-                              <Image
-                                source={{uri: items.TravelChart}}
-                                resizeMode="contain"
-                                style={{
-                                  height: 70,
-                                  aspectRatio: 1,
-                                  width: 70,
-                                }}
+                    <View
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+
+                        marginLeft: 0,
+                        marginBottom: 17,
+                      }}>
+                      <Text>QR code No* :</Text>
+                      <Pressable
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          marginLeft: 10,
+                        }}>
+                        <Text
+                          style={{
+                            marginRight: 24,
+                            backgroundColor: '#fff',
+                            paddingVertical: 5,
+                            paddingHorizontal: 20,
+                            color: '#263238',
+                            borderRadius: 5,
+                            borderWidth: 1,
+                            borderColor: '#E0E0E0',
+                            height: 30,
+                            width: 88,
+                          }}>
+                          {DriverInfo.busNumber
+                            ? `${DriverInfo?.busNumber[1].substring(0, 2)}*****`
+                            : null}
+                        </Text>
+                        <Text
+                          style={{
+                            marginRight: 10,
+                            backgroundColor: '#00D253',
+                            paddingVertical: 8,
+                            paddingHorizontal: 20,
+                            color: '#fff',
+                            borderRadius: 6,
+                            borderWidth: 1,
+                            borderColor: '#00D253',
+                          }}
+                          onPress={() => setscanQr(true)}>
+                          Scan QR
+                        </Text>
+                      </Pressable>
+                    </View>
+                    <View
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+
+                        marginLeft: 0,
+                        marginBottom: 17,
+                      }}>
+                      <Text>Report Type*</Text>
+
+                      <Controller
+                        name="comment"
+                        control={control}
+                        defaultValue=""
+                        rules={{
+                          required: {
+                            value: true,
+                            message: 'please make a comment',
+                          },
+                        }}
+                        render={({
+                          field: {onChange, onBlur, value, name, ref},
+                        }) => (
+                          // <InputBox
+                          //   onChangeText={value => onChange(value)}
+                          //   value={value}
+                          //   label="Comment"
+                          //   error={errors?.comment}
+                          //   errorText={errors?.comment?.message}
+                          // />
+                          <View
+                            style={{
+                              borderRadius: 5,
+                              borderWidth: 1,
+                              borderColor: '#E0E0E0',
+                              width: '70%',
+                              height: 35,
+                              marginTop: 10,
+                              marginLeft: 17,
+                            }}>
+                            <Picker
+                              selectedValue={selectedValue}
+                              onValueChange={(itemValue, itemIndex) =>
+                                setSelectedValue(itemValue)
+                              }
+                              style={{
+                                height: 0,
+                                width: '100%',
+                                paddingBottom: 10,
+                                marginTop: -10,
+                              }}>
+                              <Picker.Item
+                                label="Over Speed"
+                                value="Over Speed"
                               />
-                              <Text style={{color: '#455A64', marginTop: 16}}>
-                                Trave cost chart{' '}
+                              <Picker.Item
+                                label="Extra Money"
+                                value=" Extra Money"
+                              />
+                              <Picker.Item
+                                label="Over Passengers"
+                                value=" Over Passengers"
+                              />
+                              <Picker.Item
+                                label=" Fitness less Bus"
+                                value="  Fitness less Bus"
+                              />
+                              <Picker.Item
+                                label="Stop Repeatedly"
+                                value=" Stop Repeatedly"
+                              />
+                              <Picker.Item
+                                label="Driver was addicted"
+                                value="Driver was addicted"
+                              />
+                              <Picker.Item
+                                label="Confiscated on woman sit"
+                                value="Confiscated on woman sit"
+                              />
+                              <Picker.Item
+                                label="Sexual harassment of woman"
+                                value="Sexual harassment of woman"
+                              />
+                              <Picker.Item
+                                label="Driver is talking on the phone"
+                                value="Driver is talking on the phone"
+                              />
+                              <Picker.Item label="others" value="others" />
+                            </Picker>
+                          </View>
+                        )}
+                      />
+                    </View>
+
+                    <View style={[t.selfStretch, t.flexRow, t.flex, t.wFull]}>
+                      <View style={[t.w1_4, t.mB4]}>
+                        <Text>Upload Photo*</Text>
+                      </View>
+                      <TouchableOpacity
+                        onPress={() => selectPhotoTapped()}
+                        style={[t.w3_4, t.pL3]}>
+                        <View>
+                          {BusownerImage.avatarSource === null ? (
+                            <View>
+                              <Text
+                                style={[
+                                  t.border,
+                                  t.borderGray500,
+                                  t.rounded,
+                                  t.h8,
+                                  t.pY2,
+                                  t.pX2,
+                                  {
+                                    color: '#0695E3',
+                                    fontSize: 14,
+                                    fontWeight: '600',
+                                  },
+                                ]}>
+                                Select a Photo
                               </Text>
                             </View>
-                          ) : null}
-                          <View
-                            style={[
-                              t.itemsCenter,
-                              t.justifyCenter,
-                              t.mX3,
-                              {textAlign: 'center'},
-                            ]}>
+                          ) : (
                             <Image
-                              source={{uri: items.DriverImage}}
+                              style={styles.avatar}
+                              source={{uri: BusownerImage.avatarSource}}
                               resizeMode="contain"
-                              style={[
-                                {
-                                  height: 70,
-                                  width: 70,
-                                  overflow: 'hidden',
-                                },
-                              ]}
+                              style={{
+                                width: '100%',
+                                height: 70,
+                                aspectRatio: 1,
+                              }}
                             />
-                            <Text style={{color: '#455A64', marginTop: 16}}>
-                              Driver Image
-                            </Text>
-                          </View>
+                          )}
                         </View>
-                      ))}
-                    <Text
-                      style={{
-                        color: '#263238',
-                        fontSize: 18,
-                        fontWeight: '600',
-                        marginBottom: 14,
-                        marginTop: 14,
-                      }}>
-                      Bus Information
-                    </Text>
+                      </TouchableOpacity>
+                    </View>
+                    <Controller
+                      name="comment"
+                      control={control}
+                      defaultValue=""
+                      rules={{
+                        required: {
+                          value: true,
+                          message: 'please make a comment',
+                        },
+                      }}
+                      render={({
+                        field: {onChange, onBlur, value, name, ref},
+                      }) => (
+                        <InputBox
+                          onChangeText={value => onChange(value)}
+                          value={value}
+                          label="Comment"
+                          error={errors?.comment}
+                          errorText={errors?.comment?.message}
+                        />
+                      )}
+                    />
                     <View
                       style={{
-                        display: 'flex',
                         flexDirection: 'row',
-                        marginBottom: 5,
+                        justifyContent: 'flex-end',
                       }}>
-                      <Text
-                        style={{
-                          color: '#263238',
-                          fontSize: 16,
-                          fontWeight: '400',
-                          width: '35%',
-                        }}>
-                        Bus Name
-                      </Text>
-                      <Text
-                        style={{
-                          color: '#263238',
-                          fontSize: 14,
-                          fontWeight: '400',
-                        }}>
-                        : {DriverInfo?.busName[1]}
+                      <CheckBox
+                        value={isCheck}
+                        onValueChange={setCheck}
+                        style={{alignSelf: 'center'}}
+                      />
+                      <Text style={{margin: 8}}>
+                        I agree to submit this report.?
                       </Text>
                     </View>
                     <View
                       style={{
                         display: 'flex',
+                        // flex: 1,
                         flexDirection: 'row',
-                        marginBottom: 5,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        marginLeft: 45,
+                        marginTop: 10,
                       }}>
                       <Text
                         style={{
-                          color: '#263238',
-                          fontSize: 16,
-                          fontWeight: '400',
-                          width: '35%',
-                        }}>
-                        Bus Number
+                          marginRight: 10,
+                          backgroundColor: '#00D253',
+                          paddingVertical: 10,
+                          paddingHorizontal: 20,
+                          color: '#fff',
+                          borderRadius: 5,
+                          borderWidth: 1,
+                          borderColor: '#00D253',
+                        }}
+                        onPress={handleSubmit(onSubmit)}>
+                        Submit
                       </Text>
                       <Text
                         style={{
-                          color: '#263238',
-                          fontSize: 14,
-                          fontWeight: '400',
-                        }}>
-                        : {DriverInfo?.busNumber[1]}
-                      </Text>
-                    </View>
-                    <View
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        marginBottom: 5,
-                      }}>
-                      <Text
-                        style={{
-                          color: '#263238',
-                          fontSize: 16,
-                          fontWeight: '400',
-                          width: '35%',
-                        }}>
-                        {DriverInfo?.PhoneNumber[0]}
-                      </Text>
-                      <Text
-                        style={{
-                          color: '#263238',
-                          fontSize: 14,
-                          fontWeight: '400',
-                        }}>
-                        : {DriverInfo?.PhoneNumber[1]}
-                      </Text>
-                    </View>
-                    <Text
-                      style={{
-                        color: '#263238',
-                        fontSize: 18,
-                        fontWeight: '600',
-                        marginVertical: 10,
-                      }}>
-                      Bus Information
-                    </Text>
-                    <View
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        marginBottom: 5,
-                      }}>
-                      <Text
-                        style={{
-                          color: '#263238',
-                          fontSize: 16,
-                          fontWeight: '400',
-                          width: '35%',
-                        }}>
-                        {DriverInfo?.driverName[0]}
-                      </Text>
-                      <Text
-                        style={{
-                          color: '#263238',
-                          fontSize: 14,
-                          fontWeight: '400',
-                        }}>
-                        : {DriverInfo?.driverName[1]}
-                      </Text>
-                    </View>
-                    <View
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        marginBottom: 5,
-                      }}>
-                      <Text
-                        style={{
-                          color: '#263238',
-                          fontSize: 16,
-                          fontWeight: '400',
-                          width: '35%',
-                        }}>
-                        {DriverInfo?.driverLicense[0]}
-                      </Text>
-                      <Text
-                        style={{
-                          color: '#263238',
-                          fontSize: 14,
-                          fontWeight: '400',
-                        }}>
-                        : {DriverInfo?.driverLicense[1]}
-                      </Text>
-                    </View>
-                    <View
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        marginBottom: 5,
-                      }}>
-                      <Text
-                        style={{
-                          color: '#263238',
-                          fontSize: 16,
-                          fontWeight: '400',
-                          width: '35%',
-                        }}>
-                        {DriverInfo?.driverPhone[0]}
-                      </Text>
-                      <Text
-                        style={{
-                          color: '#263238',
-                          fontSize: 14,
-                          fontWeight: '400',
-                        }}>
-                        : {DriverInfo?.driverPhone[1]}
+                          marginRight: 10,
+                          backgroundColor: '#fff',
+                          paddingVertical: 10,
+                          paddingHorizontal: 20,
+                          color: '#FF3370',
+                          borderRadius: 5,
+                          borderWidth: 1,
+                          borderColor: '#FF3370',
+                        }}
+                        onPress={() => navigation.replace('HomeScreen')}>
+                        Cancel
                       </Text>
                     </View>
                   </View>
@@ -534,7 +680,7 @@ const ScanQrCode = ({navigation}) => {
       </View>
       <View
         style={{
-          display: 'flex',
+          display: keyboardHeight === 0 ? 'flex' : 'none',
           // flex: 1,
           flexDirection: 'row',
           alignItems: 'center',
@@ -708,5 +854,5 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ScanQrCode;
-AppRegistry.registerComponent('default', () => ScanQrCode);
+export default ReportBoardScreen;
+AppRegistry.registerComponent('default', () => ReportBoardScreen);

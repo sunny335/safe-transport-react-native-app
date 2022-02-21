@@ -13,8 +13,10 @@ export default function Input(props) {
             styles.input,
             props.error && t.borderRed500,
             props.style,
-            {borderRadius: 10},
+            {borderRadius: 10, height: 100, textAlignVertical: 'top'},
           ]}
+          multiline={true}
+          numberOfLines={10}
           onChangeText={onChangeText}
           value={value}
           placeholder={placeholder}
@@ -30,22 +32,12 @@ export default function Input(props) {
 }
 
 const styles = {
-  wrapper: [
-    t.selfStretch,
-    t.mB5,
-    t.flexRow,
-    t.flex,
-    t.wFull,
-    t.itemsCenter,
-    t.h8,
-  ],
+  wrapper: [t.selfStretch, t.mB1, t.flexRow, t.flex, t.wFull, t.itemsCenter],
   input: [
-    t.h8,
     t.border,
     t.selfStretch,
     t.p2,
     t.borderGray500,
-
     t.textBase,
     t.textGray700,
   ],

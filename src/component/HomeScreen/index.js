@@ -194,122 +194,126 @@ const HomeScreen = ({navigation}) => {
               paddingBottom: 75,
               paddingTop: 5,
             }}>
-            <View
-              style={{
-                display: 'flex',
-                // flex: 1,
-                flexDirection: 'row',
-                alignItems: 'center',
-                alignSelf: 'stretch',
-                marginBottom: 20,
-                paddingTop: 12,
-                paddingBottom: 12,
-                paddingLeft: 12,
-                paddingRight: 12,
-                shadowColor: '#000',
-                shadowOffset: {width: 3, height: 3},
-                shadowOpacity: 1,
-                shadowRadius: 7,
-                elevation: 3,
-                borderRadius: 15,
-                backgroundColor: '#fff',
-                width: WIDTH - 74,
-              }}>
-              <Image
-                source={amico}
-                resizeMode="contain"
+            <Pressable onPress={() => navigation.navigate('ReportBoardScreen')}>
+              <View
                 style={{
-                  width: 60,
-                  height: 55,
-                  aspectRatio: 1,
-                  marginTop: 0,
-                  marginRight: 18,
-                }}
-              />
-              <View style={{maxWidth: 200}}>
-                <Text
+                  display: 'flex',
+                  // flex: 1,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  alignSelf: 'stretch',
+                  marginBottom: 20,
+                  paddingTop: 12,
+                  paddingBottom: 12,
+                  paddingLeft: 12,
+                  paddingRight: 12,
+                  shadowColor: '#000',
+                  shadowOffset: {width: 3, height: 3},
+                  shadowOpacity: 1,
+                  shadowRadius: 7,
+                  elevation: 3,
+                  borderRadius: 15,
+                  backgroundColor: '#fff',
+                  width: WIDTH - 74,
+                }}>
+                <Image
+                  source={amico}
+                  resizeMode="contain"
                   style={{
-                    color: '#0F254F',
-                    fontSize: 14,
-                    marginBottom: 4,
-                    fontWeight: '700',
-                  }}>
-                  Report Board
-                </Text>
-                <Text style={{color: '#5C5F69', fontSize: 12}}>
-                  If you have facing any problem? Report this, we will take
-                  action as soon.
-                </Text>
-              </View>
-              <Image
-                source={IconRight}
-                resizeMode="contain"
-                style={{
-                  width: 24,
-                  height: 24,
-                  aspectRatio: 1,
-                  marginTop: 0,
-                  marginLeft: 'auto',
-                }}
-              />
-            </View>
-            <View
-              style={{
-                display: 'flex',
-                // flex: 1,
-                flexDirection: 'row',
-                alignItems: 'center',
-                marginBottom: 20,
-                paddingTop: 12,
-                paddingBottom: 12,
-                paddingLeft: 12,
-                paddingRight: 12,
-                shadowColor: '#000',
-                shadowOffset: {width: 3, height: 3},
-                shadowOpacity: 1,
-                shadowRadius: 7,
-                elevation: 3,
-                borderRadius: 15,
-                backgroundColor: '#fff',
-                width: WIDTH - 74,
-              }}>
-              <Image
-                source={bus}
-                resizeMode="contain"
-                style={{
-                  width: 60,
-                  height: 55,
-                  aspectRatio: 1,
-                  marginTop: 0,
-                  marginRight: 18,
-                }}
-              />
-              <View style={{maxWidth: 200}}>
-                <Text
+                    width: 60,
+                    height: 55,
+                    aspectRatio: 1,
+                    marginTop: 0,
+                    marginRight: 18,
+                  }}
+                />
+                <View style={{maxWidth: 200}}>
+                  <Text
+                    style={{
+                      color: '#0F254F',
+                      fontSize: 14,
+                      marginBottom: 4,
+                      fontWeight: '700',
+                    }}>
+                    Report Board
+                  </Text>
+                  <Text style={{color: '#5C5F69', fontSize: 12}}>
+                    If you have facing any problem? Report this, we will take
+                    action as soon.
+                  </Text>
+                </View>
+                <Image
+                  source={IconRight}
+                  resizeMode="contain"
                   style={{
-                    color: '#0F254F',
-                    fontSize: 14,
-                    marginBottom: 4,
-                    fontWeight: '700',
-                  }}>
-                  Bus Info
-                </Text>
-                <Text style={{color: '#5C5F69', fontSize: 12}}>
-                  You can view the Bus information.
-                </Text>
+                    width: 24,
+                    height: 24,
+                    aspectRatio: 1,
+                    marginTop: 0,
+                    marginLeft: 'auto',
+                  }}
+                />
               </View>
-              <Image
-                source={IconRight}
-                resizeMode="contain"
+            </Pressable>
+            <Pressable onPress={() => navigation.navigate('BusAndDriverInfo')}>
+              <View
                 style={{
-                  width: 24,
-                  height: 24,
-                  aspectRatio: 1,
-                  marginTop: 0,
-                  marginLeft: 'auto',
-                }}
-              />
-            </View>
+                  display: 'flex',
+                  // flex: 1,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  marginBottom: 20,
+                  paddingTop: 12,
+                  paddingBottom: 12,
+                  paddingLeft: 12,
+                  paddingRight: 12,
+                  shadowColor: '#000',
+                  shadowOffset: {width: 3, height: 3},
+                  shadowOpacity: 1,
+                  shadowRadius: 7,
+                  elevation: 3,
+                  borderRadius: 15,
+                  backgroundColor: '#fff',
+                  width: WIDTH - 74,
+                }}>
+                <Image
+                  source={bus}
+                  resizeMode="contain"
+                  style={{
+                    width: 60,
+                    height: 55,
+                    aspectRatio: 1,
+                    marginTop: 0,
+                    marginRight: 18,
+                  }}
+                />
+                <View style={{maxWidth: 200}}>
+                  <Text
+                    style={{
+                      color: '#0F254F',
+                      fontSize: 14,
+                      marginBottom: 4,
+                      fontWeight: '700',
+                    }}>
+                    Bus Info
+                  </Text>
+                  <Text style={{color: '#5C5F69', fontSize: 12}}>
+                    You can view the Bus information.
+                  </Text>
+                </View>
+                <Image
+                  source={IconRight}
+                  resizeMode="contain"
+                  style={{
+                    width: 24,
+                    height: 24,
+                    aspectRatio: 1,
+                    marginTop: 0,
+                    marginLeft: 'auto',
+                  }}
+                />
+              </View>
+            </Pressable>
             <View
               style={{
                 display: 'flex',

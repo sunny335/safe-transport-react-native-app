@@ -35,6 +35,7 @@ import QrCode from '../image/QrCode.png';
 import {getPosts} from '../actions';
 const HEIGHT = Dimensions.get('window').height;
 const WIDTH = Dimensions.get('window').width;
+
 const GeneratedQr = ({navigation}) => {
   // const userauth = useSelector(state => state.userAuth);
   const posts = useSelector(state => state.posts);

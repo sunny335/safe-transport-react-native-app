@@ -76,10 +76,6 @@ const MakeQr = ({navigation}) => {
     formState: {errors},
   } = useForm();
 
-  // const backgroundStyle = {
-  //   backgroundColor: isDarkMode ? '#ffff' : '#ffff',
-  // };
-
   const userFormLogin = async () => {
     const loggedIna = await AsyncStorage.getItem('UserData');
     setLoggedIn(JSON.parse(loggedIna));
@@ -88,6 +84,8 @@ const MakeQr = ({navigation}) => {
   useEffect(() => {
     userFormLogin();
   }, []);
+
+  //get  keyboard data
 
   function onKeyboardDidShow(e: KeyboardEvent) {
     setKeyboardHeight(e.endCoordinates.height);
@@ -325,7 +323,7 @@ const MakeQr = ({navigation}) => {
                 </Text>
                 <View style={{marginTop: 20, marginLeft: 0}}>
                   <QRCode
-                    value={`Bus name:${QrData?.name}, Bus Number:${QrData?.busNumber},Phone Number:${QrData?.PhoneNumber}, Driver Name:${QrData?.DriverName}, Driver license:${QrData?.DriverLicense}, Driver Phone:${QrData?.DriverPhone}`}
+                    value={`Bus name:${QrData?.name}, Bus Number:${QrData?.busNumber},Phone Number:${QrData?.PhoneNumber}, Driver Name:${QrData?.DriverName}, Driver license:${QrData?.DriverLicense}, Driver Phone:${QrData?.DriverPhone}, creatorID:${loggedIn.user._id}`}
                     getRef={c => setShowQr(c)}
                     logo={logoFromFile}
                     size={200}
@@ -469,6 +467,18 @@ const MakeQr = ({navigation}) => {
               paddingRight: 25,
               paddingBottom: 75,
             }}>
+            <Text
+              style={[
+                t.borderL2,
+                t.borderSolid,
+                t.borderRed700,
+                t.pL2,
+                t.mB4,
+                {color: '#455A64'},
+              ]}>
+              All information shoud be match with gov. ID (NID, Passport,
+              Driving license)
+            </Text>
             <Text
               style={{
                 fontSize: 14,

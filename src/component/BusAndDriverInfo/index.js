@@ -10,12 +10,9 @@ import {
   Text,
   useColorScheme,
   View,
-  Keyboard,
-  KeyboardEvent,
   ImageBackground,
   Image,
   Dimensions,
-  Linking,
   TouchableOpacity,
   AppRegistry,
 } from 'react-native';
@@ -35,7 +32,7 @@ import QrCode from '../image/QrCode.png';
 
 const HEIGHT = Dimensions.get('window').height;
 
-const ScanQrCode = ({navigation}) => {
+const BusAndDriverInfo = ({navigation}) => {
   // const userauth = useSelector(state => state.userAuth);
   const posts = useSelector(state => state.posts);
   const [loggedIn, setLoggedIn] = useState({});
@@ -43,7 +40,6 @@ const ScanQrCode = ({navigation}) => {
   const isDarkMode = useColorScheme() === 'dark';
   const dispatch = useDispatch();
   const [QrData, setQrData] = useState({posts: []});
-  const [keyboardHeight, setKeyboardHeight] = useState(0);
   const backgroundStyle = {
     backgroundColor: isDarkMode ? '#ffff' : '#ffff',
   };
@@ -68,63 +64,22 @@ const ScanQrCode = ({navigation}) => {
   //   );
   // };
 
-  //get  keyboard data
-
-  function onKeyboardDidShow(e: KeyboardEvent) {
-    setKeyboardHeight(e.endCoordinates.height);
-  }
-
-  function onKeyboardDidHide() {
-    setKeyboardHeight(0);
-  }
-
-  useEffect(() => {
-    Keyboard.addListener('keyboardDidShow', onKeyboardDidShow);
-    Keyboard.addListener('keyboardDidHide', onKeyboardDidHide);
-    return () => {
-      Keyboard.remove('keyboardDidShow', onKeyboardDidShow);
-      Keyboard.remove('keyboardDidHide', onKeyboardDidHide);
-    };
-  }, []);
-
   // console.log('loggedIn', posts.posts);
 
-  let DriverInfo = {busNumber: null};
-  if (qrCodeData?.data) {
-    var splitQrdata = [];
-    splitQrdata = qrCodeData?.data?.split(',');
-    DriverInfo = {
-      busName: splitQrdata[0]?.split(':'),
-      busNumber: splitQrdata[1]?.split(':'),
-      PhoneNumber: splitQrdata[2]?.split(':'),
-      driverName: splitQrdata[3]?.split(':'),
-      driverLicense: splitQrdata[4]?.split(':'),
-      driverPhone: splitQrdata[5]?.split(':'),
-      busOwner: splitQrdata[6]?.split(':'),
-    };
-    // DriverInfo.driverName = splitQrdata[3]?.split(':');
-  }
+  const ScannedData = async () => {
+    const ScannedData = await AsyncStorage.getItem('scannedQrBus');
+    setqrCodeData(JSON.parse(ScannedData));
+  };
 
   useEffect(() => {
-    if (DriverInfo.busNumber !== null) {
-      // AsyncStorage.removeItem('scannedQrBus');
-      AsyncStorage.setItem(
-        'scannedQrBus',
-        JSON.stringify({
-          busnumber: DriverInfo?.busNumber[1],
-          busName: DriverInfo?.busName[1],
-          PhoneNumber: DriverInfo?.PhoneNumber[1],
-          driverName: DriverInfo?.driverName[1],
-          driverLicense: DriverInfo?.driverLicense[1],
-          driverPhone: DriverInfo?.driverPhone[1],
-        }),
-      );
-    }
-  }, [DriverInfo]);
+    ScannedData();
+  }, []);
+
+  console.log('scanedqr data =============', qrCodeData?.busnumber);
   let QrbackendData = [];
   QrbackendData =
-    DriverInfo?.busNumber &&
-    QrData?.posts.filter(item => item.busNumber == DriverInfo?.busNumber[1]);
+    qrCodeData?.busnumber &&
+    QrData?.posts.filter(item => item.busNumber == qrCodeData?.busnumber);
   // console.log('==============', QrbackendData);
   let mainContainerHeight = HEIGHT - 390;
 
@@ -227,7 +182,7 @@ const ScanQrCode = ({navigation}) => {
           maxHeight: mainContainerHeight,
         }}>
         <ScrollView>
-          {qrCodeData?.data ? (
+          {qrCodeData?.busnumber ? (
             <View>
               <Text
                 style={{
@@ -278,58 +233,60 @@ const ScanQrCode = ({navigation}) => {
                   paddingVertical: 20,
                   marginBottom: 30,
                 }}>
-                {qrCodeData?.data ? (
+                {qrCodeData?.busnumber ? (
                   <View>
-                    {QrbackendData.length > 0 &&
+                    {QrbackendData?.length > 0 &&
                       QrbackendData.map(items => (
-                        <View
-                          style={[
-                            t.flexRow,
-                            t.flex,
-                            t.wFull,
-                            // t.selfStretch,
-                            t.itemsCenter,
-                            t.justifyCenter,
-                          ]}>
-                          {items.TravelChart !== null ? (
-                            <View>
-                              <Image
-                                source={{uri: items.TravelChart}}
-                                resizeMode="contain"
-                                style={{
-                                  height: 70,
-                                  aspectRatio: 1,
-                                  width: 70,
-                                }}
-                              />
-                              <Text style={{color: '#455A64', marginTop: 16}}>
-                                Trave cost chart{' '}
-                              </Text>
-                            </View>
-                          ) : null}
+                        <>
                           <View
                             style={[
+                              t.flexRow,
+                              t.flex,
+                              t.wFull,
+                              // t.selfStretch,
                               t.itemsCenter,
                               t.justifyCenter,
-                              t.mX3,
-                              {textAlign: 'center'},
                             ]}>
-                            <Image
-                              source={{uri: items.DriverImage}}
-                              resizeMode="contain"
+                            {items.TravelChart !== null ? (
+                              <View>
+                                <Image
+                                  source={{uri: items.TravelChart}}
+                                  resizeMode="contain"
+                                  style={{
+                                    height: 70,
+                                    aspectRatio: 1,
+                                    width: 70,
+                                  }}
+                                />
+                                <Text style={{color: '#455A64', marginTop: 16}}>
+                                  Trave cost chart{' '}
+                                </Text>
+                              </View>
+                            ) : null}
+                            <View
                               style={[
-                                {
-                                  height: 70,
-                                  width: 70,
-                                  overflow: 'hidden',
-                                },
-                              ]}
-                            />
-                            <Text style={{color: '#455A64', marginTop: 16}}>
-                              Driver Image
-                            </Text>
+                                t.itemsCenter,
+                                t.justifyCenter,
+                                t.mX3,
+                                {textAlign: 'center'},
+                              ]}>
+                              <Image
+                                source={{uri: items.DriverImage}}
+                                resizeMode="contain"
+                                style={[
+                                  {
+                                    height: 70,
+                                    width: 70,
+                                    overflow: 'hidden',
+                                  },
+                                ]}
+                              />
+                              <Text style={{color: '#455A64', marginTop: 16}}>
+                                Driver Image
+                              </Text>
+                            </View>
                           </View>
-                        </View>
+                        </>
                       ))}
                     <Text
                       style={{
@@ -362,7 +319,7 @@ const ScanQrCode = ({navigation}) => {
                           fontSize: 14,
                           fontWeight: '400',
                         }}>
-                        : {DriverInfo?.busName[1]}
+                        : {qrCodeData?.busName}
                       </Text>
                     </View>
                     <View
@@ -386,7 +343,7 @@ const ScanQrCode = ({navigation}) => {
                           fontSize: 14,
                           fontWeight: '400',
                         }}>
-                        : {DriverInfo?.busNumber[1]}
+                        : {qrCodeData?.busnumber}
                       </Text>
                     </View>
                     <View
@@ -402,7 +359,7 @@ const ScanQrCode = ({navigation}) => {
                           fontWeight: '400',
                           width: '35%',
                         }}>
-                        {DriverInfo?.PhoneNumber[0]}
+                        {qrCodeData?.PhoneNumber}
                       </Text>
                       <Text
                         style={{
@@ -410,7 +367,7 @@ const ScanQrCode = ({navigation}) => {
                           fontSize: 14,
                           fontWeight: '400',
                         }}>
-                        : {DriverInfo?.PhoneNumber[1]}
+                        : {qrCodeData?.PhoneNumber}
                       </Text>
                     </View>
                     <Text
@@ -435,7 +392,7 @@ const ScanQrCode = ({navigation}) => {
                           fontWeight: '400',
                           width: '35%',
                         }}>
-                        {DriverInfo?.driverName[0]}
+                        {qrCodeData?.driverName}
                       </Text>
                       <Text
                         style={{
@@ -443,7 +400,7 @@ const ScanQrCode = ({navigation}) => {
                           fontSize: 14,
                           fontWeight: '400',
                         }}>
-                        : {DriverInfo?.driverName[1]}
+                        : {qrCodeData?.driverName}
                       </Text>
                     </View>
                     <View
@@ -459,7 +416,7 @@ const ScanQrCode = ({navigation}) => {
                           fontWeight: '400',
                           width: '35%',
                         }}>
-                        {DriverInfo?.driverLicense[0]}
+                        {qrCodeData?.driverLicense}
                       </Text>
                       <Text
                         style={{
@@ -467,7 +424,7 @@ const ScanQrCode = ({navigation}) => {
                           fontSize: 14,
                           fontWeight: '400',
                         }}>
-                        : {DriverInfo?.driverLicense[1]}
+                        : {qrCodeData?.driverLicense}
                       </Text>
                     </View>
                     <View
@@ -483,7 +440,7 @@ const ScanQrCode = ({navigation}) => {
                           fontWeight: '400',
                           width: '35%',
                         }}>
-                        {DriverInfo?.driverPhone[0]}
+                        {qrCodeData?.driverPhone}
                       </Text>
                       <Text
                         style={{
@@ -491,7 +448,7 @@ const ScanQrCode = ({navigation}) => {
                           fontSize: 14,
                           fontWeight: '400',
                         }}>
-                        : {DriverInfo?.driverPhone[1]}
+                        : {qrCodeData?.driverPhone}
                       </Text>
                     </View>
                   </View>
@@ -504,27 +461,7 @@ const ScanQrCode = ({navigation}) => {
                       borderRadius: 5,
                       overflow: 'hidden',
                     }}>
-                    <QRCodeScanner
-                      onRead={e => setqrCodeData(e)}
-                      // ref={node => {
-                      //   this.scanner = node;
-                      // }}
-                      // flashMode={RNCamera.Constants.FlashMode.torch}
-                      topContent={
-                        <Text style={styles.centerText}>
-                          Go to{' '}
-                          <Text style={styles.textBold}>
-                            wikipedia.org/wiki/QR_code
-                          </Text>{' '}
-                          on your computer and scan the QR code.
-                        </Text>
-                      }
-                      bottomContent={
-                        <TouchableOpacity style={styles.buttonTouchable}>
-                          <Text style={styles.buttonText}>OK. Got it!</Text>
-                        </TouchableOpacity>
-                      }
-                    />
+                    <Text>Scan Now to Get Bus and Driver info</Text>
                   </View>
                 )}
               </View>
@@ -708,5 +645,5 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ScanQrCode;
-AppRegistry.registerComponent('default', () => ScanQrCode);
+export default BusAndDriverInfo;
+AppRegistry.registerComponent('default', () => BusAndDriverInfo);
