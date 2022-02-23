@@ -30,9 +30,10 @@ import bus from '../image/bus.png';
 import contact from '../image/Contact.png';
 import History from '../image/history.png';
 import HomeImg from '../image/Home.png';
-import ProfileImg from '../image/QrCode.png';
+import ProfileImg from '../image/profileicon.png';
 import QrCode from '../image/QrCode.png';
 import generateQr from '../image/generateQr.png';
+import generatedQr from '../image/generated.png';
 import SplashScreen from '../SplashScreen/SplashScreen';
 
 import {UserFormsignout} from '../actions/userAuth.action';
@@ -69,9 +70,9 @@ const HomeScreen = ({navigation}) => {
     if (userauth.loading) {
       AsyncStorage.removeItem('isLoggedIn');
       AsyncStorage.removeItem('UserData');
-      setTimeout(() => {
-        setAnimating(true);
-      }, 200);
+      setAnimating(true);
+      // setTimeout(() => {
+      // }, 200);
     } else {
       setAnimating(false);
     }
@@ -99,7 +100,6 @@ const HomeScreen = ({navigation}) => {
             <View
               style={{
                 display: 'flex',
-                // flex: 1,
                 flexDirection: 'row',
                 marginBottom: publicuser ? 30 : 10,
                 marginTop: 80,
@@ -372,73 +372,14 @@ const HomeScreen = ({navigation}) => {
                 }}
               />
             </View>
-            <View
-              style={{
-                display: 'flex',
-                // flex: 1,
-                flexDirection: 'row',
-                alignItems: 'center',
-                marginBottom: 20,
-                paddingTop: 12,
-                paddingBottom: 12,
-                paddingLeft: 12,
-                paddingRight: 12,
-                shadowColor: '#000',
-                shadowOffset: {width: 3, height: 3},
-                shadowOpacity: 1,
-                shadowRadius: 7,
-                elevation: 3,
-                borderRadius: 15,
-                backgroundColor: '#fff',
-                width: WIDTH - 74,
-              }}>
-              <Image
-                source={History}
-                resizeMode="contain"
-                style={{
-                  width: 60,
-                  height: 55,
-                  aspectRatio: 1,
-                  marginTop: 0,
-                  marginRight: 18,
-                }}
-              />
-              <View style={{maxWidth: 200}}>
-                <Text
-                  style={{
-                    color: '#0F254F',
-                    fontSize: 14,
-                    marginBottom: 4,
-                    fontWeight: '700',
-                  }}>
-                  View History
-                </Text>
-                <Text style={{color: '#5C5F69', fontSize: 12}}>
-                  View all of used history.
-                </Text>
-              </View>
-              <Image
-                source={IconRight}
-                resizeMode="contain"
-                style={{
-                  width: 24,
-                  height: 24,
-                  aspectRatio: 1,
-                  marginTop: 0,
-                  marginLeft: 'auto',
-                }}
-              />
-            </View>
-            {/* for bus authority */}
-            <Text onPress={() => navigation.navigate('generateQr')}>
+            <Pressable onPress={() => navigation.navigate('ReportHistory')}>
               <View
                 style={{
                   display: 'flex',
                   // flex: 1,
                   flexDirection: 'row',
                   alignItems: 'center',
-                  justifyContent: 'space-between',
-                  marginBottom: 20,
+
                   paddingTop: 12,
                   paddingBottom: 12,
                   paddingLeft: 12,
@@ -453,7 +394,7 @@ const HomeScreen = ({navigation}) => {
                   width: WIDTH - 74,
                 }}>
                 <Image
-                  source={generateQr}
+                  source={History}
                   resizeMode="contain"
                   style={{
                     width: 60,
@@ -463,7 +404,7 @@ const HomeScreen = ({navigation}) => {
                     marginRight: 18,
                   }}
                 />
-                <View style={{width: WIDTH - 158}}>
+                <View style={{maxWidth: 200}}>
                   <Text
                     style={{
                       color: '#0F254F',
@@ -471,10 +412,10 @@ const HomeScreen = ({navigation}) => {
                       marginBottom: 4,
                       fontWeight: '700',
                     }}>
-                    Generate QR Code
+                    View History
                   </Text>
                   <Text style={{color: '#5C5F69', fontSize: 12}}>
-                    Generate a QR Code for your transport
+                    View all of used history.
                   </Text>
                 </View>
                 <Image
@@ -489,70 +430,138 @@ const HomeScreen = ({navigation}) => {
                   }}
                 />
               </View>
-            </Text>
-            <Text
-              onPress={() => navigation.navigate('GeneratedQr')}
-              style={{marginTop: 20}}>
-              <View
-                style={[
-                  {
-                    display: 'flex',
-                    // flex: 1,
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    marginBottom: 20,
-                    paddingTop: 12,
-                    paddingBottom: 12,
-                    paddingLeft: 12,
-                    paddingRight: 12,
-                    shadowColor: '#000',
-                    shadowOffset: {width: 3, height: 3},
-                    shadowOpacity: 1,
-                    shadowRadius: 7,
-                    elevation: 3,
-                    borderRadius: 15,
-                    backgroundColor: '#fff',
-                    width: WIDTH - 74,
-                  },
-                ]}>
-                <Image
-                  source={generateQr}
-                  resizeMode="contain"
-                  style={{
-                    width: 60,
-                    height: 55,
-                    aspectRatio: 1,
-                    marginTop: 0,
-                    marginRight: 18,
-                  }}
-                />
-                <View style={{width: WIDTH - 158}}>
-                  <Text
-                    style={{
-                      color: '#0F254F',
-                      fontSize: 14,
-                      marginBottom: 4,
-                      fontWeight: '700',
-                    }}>
-                    Generated QR Code
-                  </Text>
-                  <Text style={{color: '#5C5F69', fontSize: 12}}>
-                    View All Generated QR Code
-                  </Text>
-                </View>
-                <Image
-                  source={IconRight}
-                  resizeMode="contain"
-                  style={{
-                    width: 24,
-                    height: 24,
-                    aspectRatio: 1,
-                    marginTop: 0,
-                    marginLeft: 'auto',
-                  }}
-                />
-              </View>
+            </Pressable>
+            {/* for bus authority */}
+            <Text>
+              {loggedIn?.user?.signupAs == 'transport authority' ? (
+                <>
+                  {' '}
+                  <Pressable onPress={() => navigation.navigate('generateQr')}>
+                    <View
+                      style={{
+                        display: 'flex',
+                        // flex: 1,
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        marginBottom: 20,
+                        paddingTop: 12,
+                        paddingBottom: 12,
+                        paddingLeft: 12,
+                        paddingRight: 12,
+                        shadowColor: '#000',
+                        shadowOffset: {width: 3, height: 3},
+                        shadowOpacity: 1,
+                        shadowRadius: 7,
+                        elevation: 3,
+                        borderRadius: 15,
+                        backgroundColor: '#fff',
+                        width: WIDTH - 74,
+                      }}>
+                      <Image
+                        source={generateQr}
+                        resizeMode="contain"
+                        style={{
+                          width: 60,
+                          height: 55,
+                          aspectRatio: 1,
+                          marginTop: 0,
+                          marginRight: 18,
+                        }}
+                      />
+                      <View style={{width: WIDTH - 158}}>
+                        <Text
+                          style={{
+                            color: '#0F254F',
+                            fontSize: 14,
+                            marginBottom: 4,
+                            fontWeight: '700',
+                          }}>
+                          Generate QR Code
+                        </Text>
+                        <Text style={{color: '#5C5F69', fontSize: 12}}>
+                          Generate a QR Code for your transport
+                        </Text>
+                      </View>
+                      <Image
+                        source={IconRight}
+                        resizeMode="contain"
+                        style={{
+                          width: 24,
+                          height: 24,
+                          aspectRatio: 1,
+                          marginTop: 0,
+                          marginLeft: 'auto',
+                        }}
+                      />
+                    </View>
+                  </Pressable>
+                  <Pressable
+                    onPress={() => navigation.navigate('GeneratedQr')}
+                    style={{marginTop: 20}}>
+                    <View
+                      style={[
+                        {
+                          display: 'flex',
+                          // flex: 1,
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          marginBottom: 20,
+                          paddingTop: 12,
+                          paddingBottom: 12,
+                          paddingLeft: 12,
+                          paddingRight: 12,
+                          shadowColor: '#000',
+                          shadowOffset: {width: 3, height: 3},
+                          shadowOpacity: 1,
+                          shadowRadius: 7,
+                          elevation: 3,
+                          borderRadius: 15,
+                          backgroundColor: '#fff',
+                          width: WIDTH - 74,
+                        },
+                      ]}>
+                      <Image
+                        source={generatedQr}
+                        resizeMode="contain"
+                        style={{
+                          width: 60,
+                          height: 55,
+                          aspectRatio: 1,
+                          marginTop: 0,
+                          marginRight: 18,
+                        }}
+                      />
+                      <View style={{width: WIDTH - 158}}>
+                        <Text
+                          style={{
+                            color: '#0F254F',
+                            fontSize: 14,
+                            marginBottom: 4,
+                            fontWeight: '700',
+                          }}>
+                          Generated QR Code
+                        </Text>
+                        <Text style={{color: '#5C5F69', fontSize: 12}}>
+                          View All Generated QR Code
+                        </Text>
+                      </View>
+                      <Image
+                        source={IconRight}
+                        resizeMode="contain"
+                        style={{
+                          width: 24,
+                          height: 24,
+                          aspectRatio: 1,
+                          marginTop: 0,
+                          marginLeft: 'auto',
+                        }}
+                      />
+                    </View>
+                  </Pressable>
+                </>
+              ) : null}
             </Text>
           </View>
         </ScrollView>
@@ -580,7 +589,7 @@ const HomeScreen = ({navigation}) => {
           position: 'absolute',
           bottom: 0,
         }}>
-        <Text onPress={() => navigation.replace('HomeScreen')}>
+        <Text>
           <View style={{width: 35, textAlign: 'center'}}>
             <Image
               source={HomeImg}

@@ -30,7 +30,7 @@ import avatar from '../image/avatar.png';
 import DoubleRight from '../image/DoubleRight.png';
 
 import HomeImg from '../image/Home.png';
-import ProfileImg from '../image/QrCode.png';
+import ProfileImg from '../image/profileicon.png';
 import QrCode from '../image/QrCode.png';
 import {getPosts} from '../actions';
 const HEIGHT = Dimensions.get('window').height;
@@ -94,6 +94,12 @@ const GeneratedQr = ({navigation}) => {
   //   QrData?.posts[0]?.DriverImage,
   // );
 
+  let QrbackendData = [];
+  QrbackendData =
+    QrData?.posts.length >= 1 &&
+    QrData?.posts.filter(item => item.creatorID == loggedIn?.user?._id);
+
+  console.log({QrbackendData});
   return (
     <View
       style={{
@@ -230,128 +236,129 @@ const GeneratedQr = ({navigation}) => {
               ]}>
               {posts?.isLoading ? (
                 <Text>Loading...</Text>
-              ) : QrData?.posts.length < 1 ? (
+              ) : QrbackendData?.length < 1 ? (
                 <Text> No Result Found. Please Try again</Text>
               ) : (
                 <View style={[t.wFull, t.flexCol, t.flex, t.wFull]}>
-                  {QrData?.posts.map(items => (
-                    <View
-                      style={[
-                        t.border,
-                        t.borderGreen200,
-                        t.roundedLg,
-                        // t.bgGreen100,
-                        t.shadowLg,
-                        t.mT1,
-                        {marginBottom: 20},
-                        {width: WIDTH - 60},
-                        t.p1,
-                        t.pX2,
-                        t.shadowInner,
-                      ]}>
+                  {QrbackendData?.length > 0 &&
+                    QrbackendData?.map(items => (
                       <View
                         style={[
-                          t.flexRow,
-                          t.flex,
-                          t.wFull,
-                          // t.selfStretch,
-                          t.itemsCenter,
-                          t.justifyCenter,
+                          t.border,
+                          t.borderGreen200,
+                          t.roundedLg,
+                          // t.bgGreen100,
+                          t.shadowLg,
+                          t.mT1,
+                          {marginBottom: 20},
+                          {width: WIDTH - 60},
+                          t.p1,
+                          t.pX2,
+                          t.shadowInner,
                         ]}>
-                        {items.TravelChart !== null ? (
-                          <View>
-                            <Image
-                              source={{uri: items.TravelChart}}
-                              resizeMode="contain"
-                              style={{
-                                height: 70,
-                                aspectRatio: 1,
-                              }}
-                            />
-                            <Text>Trave cost chart </Text>
-                          </View>
-                        ) : null}
                         <View
                           style={[
-                            // t.wFull,
+                            t.flexRow,
+                            t.flex,
+                            t.wFull,
                             // t.selfStretch,
                             t.itemsCenter,
                             t.justifyCenter,
-                            t.mX3,
-                            {textAlign: 'center'},
                           ]}>
-                          <Image
-                            source={{uri: items.DriverImage}}
-                            resizeMode="cover"
-                            style={[
-                              {
-                                height: 70,
-                                width: 70,
-                                // aspectRatio: 1,
-                                borderRadius: 50,
-                                overflow: 'hidden',
-                              },
-                            ]}
-                          />
-                          <Text>Driver Image</Text>
-                        </View>
-                        <TouchableOpacity
-                          onPress={() =>
-                            saveQrToDisk((data = items.selectedFile))
-                          }>
+                          {items.TravelChart !== null ? (
+                            <View>
+                              <Image
+                                source={{uri: items.TravelChart}}
+                                resizeMode="contain"
+                                style={{
+                                  height: 70,
+                                  aspectRatio: 1,
+                                }}
+                              />
+                              <Text>Trave cost chart </Text>
+                            </View>
+                          ) : null}
                           <View
                             style={[
                               // t.wFull,
                               // t.selfStretch,
                               t.itemsCenter,
                               t.justifyCenter,
+                              t.mX3,
                               {textAlign: 'center'},
                             ]}>
                             <Image
-                              source={{uri: items.selectedFile}}
+                              source={{uri: items.DriverImage}}
                               resizeMode="cover"
                               style={[
                                 {
                                   height: 70,
                                   width: 70,
                                   // aspectRatio: 1,
-
+                                  borderRadius: 50,
                                   overflow: 'hidden',
                                 },
                               ]}
                             />
-                            <Text>Qr Code</Text>
+                            <Text>Driver Image</Text>
                           </View>
-                        </TouchableOpacity>
+                          <TouchableOpacity
+                            onPress={() =>
+                              saveQrToDisk((data = items.selectedFile))
+                            }>
+                            <View
+                              style={[
+                                // t.wFull,
+                                // t.selfStretch,
+                                t.itemsCenter,
+                                t.justifyCenter,
+                                {textAlign: 'center'},
+                              ]}>
+                              <Image
+                                source={{uri: items.selectedFile}}
+                                resizeMode="cover"
+                                style={[
+                                  {
+                                    height: 70,
+                                    width: 70,
+                                    // aspectRatio: 1,
+
+                                    overflow: 'hidden',
+                                  },
+                                ]}
+                              />
+                              <Text>Qr Code</Text>
+                            </View>
+                          </TouchableOpacity>
+                        </View>
+                        <Text
+                          style={[
+                            t.textBlack,
+                            t.textBase,
+                            t.fontBold,
+                            t.mB2,
+                            t.mT1,
+                          ]}>
+                          Bus Information
+                        </Text>
+                        <Text>Bus Name:{items.name}</Text>
+                        <Text> Bus Number:{items.busNumber}</Text>
+                        <Text> Phone Number:{items.PhoneNumber}</Text>
+                        <Text
+                          style={[
+                            t.textBlack,
+                            t.textBase,
+                            t.fontBold,
+                            t.mB2,
+                            t.mT1,
+                          ]}>
+                          Driver Information
+                        </Text>
+                        <Text>Driver Name: {items.DriverName}</Text>
+                        <Text>Driver License:{items.DriverLicense}</Text>
+                        <Text> Driver Number:{items.DriverPhone}</Text>
                       </View>
-                      <Text
-                        style={[
-                          t.textBlack,
-                          t.textBase,
-                          t.fontBold,
-                          t.mB2,
-                          t.mT1,
-                        ]}>
-                        Bus Information
-                      </Text>
-                      <Text>Bus Name:{items.name}</Text>
-                      <Text> Bus Number:{items.busNumber}</Text>
-                      <Text> Phone Number:{items.PhoneNumber}</Text>
-                      <Text
-                        style={[
-                          t.textBlack,
-                          t.textBase,
-                          t.fontBold,
-                          t.mB2,
-                          t.mT1,
-                        ]}>
-                        Driver Information
-                      </Text>
-                      <Text>Driver Name: {items.DriverName}</Text>
-                      <Text>Driver License:{items.DriverLicense}</Text>
-                      <Text> Driver Number:{items.DriverPhone}</Text>
-                    </View>
-                  ))}
+                    ))}
                 </View>
               )}
             </View>

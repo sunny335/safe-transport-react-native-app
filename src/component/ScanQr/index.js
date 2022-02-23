@@ -29,8 +29,8 @@ import image1 from '../image/loginBg.png';
 import avatar from '../image/avatar.png';
 import DoubleRight from '../image/DoubleRight.png';
 
-import HomeImg from '../image/Home.png';
-import ProfileImg from '../image/QrCode.png';
+import HomeImg from '../image/homedefault.png';
+import ProfileImg from '../image/profileicon.png';
 import QrCode from '../image/QrCode.png';
 
 const HEIGHT = Dimensions.get('window').height;
@@ -570,7 +570,7 @@ const ScanQrCode = ({navigation}) => {
             />
             <Text
               style={{
-                color: '#27AE60',
+                color: '#4F4F4F',
                 fontSize: 12,
                 fontWeight: '700',
                 marginTop: 9,
@@ -579,7 +579,7 @@ const ScanQrCode = ({navigation}) => {
             </Text>
           </View>
         </Text>
-        <Text onPress={() => navigation.replace('HomeScreen')}>
+        <Text>
           <View
             style={{
               width: 70,

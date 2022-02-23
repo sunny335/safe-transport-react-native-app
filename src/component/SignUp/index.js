@@ -57,7 +57,7 @@ import done from '../image/done.png';
 //   uri: image1,
 // };
 
-const index = ({navigation, setLoggedIns}) => {
+const Index = ({navigation, setLoggedIns}) => {
   const isDarkMode = useColorScheme() === 'dark';
   const [signupProgress, setSignUpProgress] = React.useState(false);
   const [modalVisible, setModalVisible] = useState(false);
@@ -70,7 +70,7 @@ const index = ({navigation, setLoggedIns}) => {
   const backgroundStyle = {
     backgroundColor: isDarkMode ? '#ffff' : '#ffff',
   };
-  const [login, setLogin] = useState(null);
+  const [login, setLogin] = useState(true);
   const [checked, setChecked] = useState('public');
   const auth = useSelector(state => state.userAuth);
   const user = useSelector(state => state.userRegistration);
@@ -96,16 +96,18 @@ const index = ({navigation, setLoggedIns}) => {
     dispatch(Userlogin(datas));
   };
   useEffect(() => {
-    if (user.message == 'User created Successfully...!') {
-      setModalVisible(true);
-      setTimeout(() => {
-        setLogin(true);
+    if (user.loading) {
+      if (user.message == 'User created Successfully...!') {
+        setModalVisible(true);
+        setTimeout(() => {
+          setLogin(true);
+          setModalVisible(false);
+        }, 1000);
+      } else {
         setModalVisible(false);
-      }, 3000);
-    } else {
-      setModalVisible(false);
+      }
     }
-  }, [user.message]);
+  }, [user.loading]);
 
   useEffect(() => {
     if (user.loading) {
@@ -144,6 +146,13 @@ const index = ({navigation, setLoggedIns}) => {
       setLoginError('');
     }
   }, [auth.error]);
+
+  const validate = (value: string) => {
+    const matches = value.match(
+      /^(?:0\.(?:0[0-9]|[0-9]\d?)|[0-9]\d*(?:\.\d{1,2})?)(?:e[+-]?\d+)?$/,
+    );
+    return matches?.length || 'String is not a number';
+  };
 
   return (
     <>
@@ -508,6 +517,11 @@ const index = ({navigation, setLoggedIns}) => {
                     value: 11,
                     message: 'Phone number must have at least 11 number',
                   },
+                  maxLength: {
+                    value: 11,
+                    message: 'Phone number max length can be 11',
+                  },
+                  validate,
                 }}
                 render={({field: {onChange, onBlur, value, name, ref}}) => (
                   <Input
@@ -723,4 +737,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default index;
+export default Index;

@@ -25,19 +25,22 @@ import avatar from '../image/avatar.png';
 import DoubleRight from '../image/DoubleRight.png';
 
 import HomeImg from '../image/Home.png';
-import ProfileImg from '../image/QrCode.png';
+import ProfileImg from '../image/profileicon.png';
 import QrCode from '../image/QrCode.png';
-
+import {getPosts} from '../actions/report.action';
+import {color} from 'react-native-reanimated';
 const HEIGHT = Dimensions.get('window').height;
 
-const index = ({navigation}) => {
+const Index = ({navigation}) => {
   // const userauth = useSelector(state => state.userAuth);
   const isDarkMode = useColorScheme() === 'dark';
   const [loggedIn, setLoggedIn] = useState({});
+  const posts = useSelector(state => state.reports);
+  const [Report, setReport] = useState({posts: []});
+  const dispatch = useDispatch();
   const backgroundStyle = {
     backgroundColor: isDarkMode ? '#ffff' : '#ffff',
   };
-
   const userFormLogin = async () => {
     const loggedIna = await AsyncStorage.getItem('UserData');
     setLoggedIn(JSON.parse(loggedIna));
@@ -47,6 +50,17 @@ const index = ({navigation}) => {
     userFormLogin();
   }, []);
 
+  useEffect(() => {
+    dispatch(getPosts());
+    setReport(posts.posts);
+  }, []);
+
+  let ReportbackendData = [];
+  ReportbackendData =
+    Report?.posts.length >= 1 &&
+    Report?.posts.filter(item => item.ReporterID == loggedIn?.user?._id);
+
+  console.log('dskjfsdigh hkjsdhiu', ReportbackendData);
   return (
     <View
       style={{
@@ -161,68 +175,59 @@ const index = ({navigation}) => {
             paddingVertical: 20,
           }}>
           <ScrollView>
-            <View
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                flexDirection: 'row',
-              }}>
+            <View>
               <Text
-                style={{
-                  color: '#263238',
-                  fontWeight: '700',
-                  fontSize: 18,
-                  width: 140,
-                }}>
-                Full Name :
+                style={{color: '#263238', fontWeight: '700', marginBottom: 14}}>
+                My Reports
               </Text>
-              <Text style={{color: '#27AE60', fontWeight: '700', fontSize: 18}}>
-                {loggedIn?.user?.firstName &&
-                  loggedIn?.user?.firstName + ' ' + loggedIn?.user.lastName}
-              </Text>
-            </View>
-            <View
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                flexDirection: 'row',
-              }}>
-              <Text
-                style={{
-                  color: '#263238',
-                  fontWeight: '700',
-                  fontSize: 18,
-                  width: 140,
-                }}>
-                Phone Number :
-              </Text>
-              <Text
-                style={{
-                  color: '#27AE60',
-                  fontWeight: '700',
-                  fontSize: 18,
-                }}>
-                {loggedIn.user && loggedIn?.user.Phone}
-              </Text>
-            </View>
-            <View
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                flexDirection: 'row',
-              }}>
-              <Text
-                style={{
-                  color: '#263238',
-                  fontWeight: '700',
-                  fontSize: 18,
-                  width: 140,
-                }}>
-                Email :
-              </Text>
-              <Text style={{color: '#27AE60', fontWeight: '700', fontSize: 18}}>
-                {loggedIn.user && loggedIn?.user.email}
-              </Text>
+              {ReportbackendData.length > 0 ? (
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    backgroundColor: '#2EC16C',
+                    alignItems: 'center',
+                    padding: 6,
+                  }}>
+                  <Text style={{width: '33.33%', color: '#fff'}}>Bus Name</Text>
+                  <Text style={{width: '33.33%', color: '#fff'}}>
+                    Bus Number
+                  </Text>
+                  <Text style={{width: '33.33%', color: '#fff'}}>Date</Text>
+                </View>
+              ) : (
+                <Text>You have not created any report yet</Text>
+              )}
+
+              {ReportbackendData.length > 0 &&
+                ReportbackendData.map(item => (
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      backgroundColor: '#D6FFE7',
+                      padding: 6,
+                      marginBottom: 2,
+                    }}>
+                    {item?.ReportedBusInfo
+                      ? item.ReportedBusInfo.map(items => (
+                          <>
+                            <Text style={{width: '33.33%', color: '#000000'}}>
+                              {items.name}
+                            </Text>
+                            <Text style={{width: '33.33%', color: '#000000'}}>
+                              {items.busNumber}
+                            </Text>
+                          </>
+                        ))
+                      : null}
+
+                    <Text style={{width: '33.33%', color: '#000000'}}>
+                      {item.createdAt.split('T')[0]}
+                    </Text>
+                  </View>
+                ))}
             </View>
           </ScrollView>
         </View>
@@ -386,4 +391,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default index;
+export default Index;

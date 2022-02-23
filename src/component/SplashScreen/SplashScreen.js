@@ -39,7 +39,7 @@ const SplashScreen = ({navigation}) => {
         style={{width: '100%', margin: 0}}
       />
       <Text style={{color: '#fff', fontSize: 30, fontWeight: '700'}}>
-        SAFE MOVE
+        SAFE TRANSPORT
       </Text>
       <ActivityIndicator
         animating={animating}

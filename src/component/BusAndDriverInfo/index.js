@@ -27,7 +27,7 @@ import avatar from '../image/avatar.png';
 import DoubleRight from '../image/DoubleRight.png';
 
 import HomeImg from '../image/Home.png';
-import ProfileImg from '../image/QrCode.png';
+import ProfileImg from '../image/profileicon.png';
 import QrCode from '../image/QrCode.png';
 
 const HEIGHT = Dimensions.get('window').height;

@@ -24,7 +24,7 @@ import {launchImageLibrary} from 'react-native-image-picker';
 
 import {useForm, Controller} from 'react-hook-form';
 import {useDispatch, useSelector} from 'react-redux';
-let logoFromFile = require('../image/profile.jpg');
+let logoFromFile = require('../image/Qrbg.png');
 import RNFS from 'react-native-fs';
 // import QRCode from 'react-qr-code';
 import QRCode from 'react-native-qrcode-svg';
@@ -37,7 +37,7 @@ import settings from '../image/Settings.png';
 import done from '../image/done.png';
 
 import HomeImg from '../image/Home.png';
-import ProfileImg from '../image/QrCode.png';
+import ProfileImg from '../image/profileicon.png';
 import QrCode from '../image/QrCode.png';
 const HEIGHT = Dimensions.get('window').height;
 const WIDTH = Dimensions.get('window').width;
@@ -463,9 +463,20 @@ const MakeQr = ({navigation}) => {
         <ScrollView>
           <View
             style={{
-              paddingLeft: 25,
-              paddingRight: 25,
-              paddingBottom: 75,
+              marginLeft: 20,
+              marginRight: 20,
+              paddingLeft: 10,
+              paddingRight: 10,
+              marginBottom: 50,
+              paddingBottom: 10,
+              marginTop: 10,
+              shadowColor: '#000',
+              shadowOffset: {width: 5, height: 5},
+              shadowOpacity: 5,
+              shadowRadius: 5,
+              elevation: 5,
+              backgroundColor: '#fff',
+              borderRadius: 10,
             }}>
             <Text
               style={[
@@ -474,7 +485,7 @@ const MakeQr = ({navigation}) => {
                 t.borderRed700,
                 t.pL2,
                 t.mB4,
-                {color: '#455A64'},
+                {color: '#455A64', marginTop: 10},
               ]}>
               All information shoud be match with gov. ID (NID, Passport,
               Driving license)

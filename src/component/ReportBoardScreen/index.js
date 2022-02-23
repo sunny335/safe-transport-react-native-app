@@ -19,6 +19,7 @@ import {
   TouchableOpacity,
   AppRegistry,
   Pressable,
+  Modal,
 } from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 import CheckBox from '@react-native-community/checkbox';
@@ -35,9 +36,10 @@ import {CreateReport} from '../actions/report.action';
 // import profile from '../image/profile.jpg';
 import avatar from '../image/avatar.png';
 import DoubleRight from '../image/DoubleRight.png';
+import done from '../image/done.png';
 
 import HomeImg from '../image/Home.png';
-import ProfileImg from '../image/QrCode.png';
+import ProfileImg from '../image/profileicon.png';
 import QrCode from '../image/QrCode.png';
 
 const HEIGHT = Dimensions.get('window').height;
@@ -52,9 +54,12 @@ const ReportBoardScreen = ({navigation}) => {
   const posts = useSelector(state => state.posts);
   const [selectedValue, setSelectedValue] = useState('Over Speed');
   const [isCheck, setCheck] = useState(false);
+  const [isCheckError, setCheckError] = useState(false);
+  const [scannedError, setscanError] = useState(false);
   const [loggedIn, setLoggedIn] = useState({});
   const [scannedQr, setscanQr] = useState(false);
   const [qrCodeData, setqrCodeData] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
   const isDarkMode = useColorScheme() === 'dark';
   const dispatch = useDispatch();
   const [QrData, setQrData] = useState({posts: []});
@@ -200,7 +205,14 @@ const ReportBoardScreen = ({navigation}) => {
     // isCheck
     // reportedPhoto: BusownerImage.avatarSource,
     // ReportedBusInfo:QrbackendData,
-    if (QrbackendData?.length > 0) {
+    if (DriverInfo?.busNumber == null) {
+      setscanError(true);
+    } else if (isCheck === false) {
+      setCheckError(true);
+    } else if (QrbackendData?.length > 0) {
+      setCheckError(false);
+      setscanError(false);
+      setModalVisible(true);
       dispatch(
         CreateReport({
           ...data,
@@ -223,6 +235,73 @@ const ReportBoardScreen = ({navigation}) => {
         backgroundColor: '#fff',
       }}>
       {/* <StatusBar barStyle={isDarkMode ? '#fff' : 'dark-content'} /> */}
+      {modalVisible && (
+        <Modal
+          animationType="slide"
+          visible={modalVisible}
+          transparent={true}
+          onRequestClose={() => {
+            Alert.alert('Modal has been closed.');
+            setModalVisible(false);
+          }}>
+          <View
+            style={{
+              flex: 1,
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'center',
+              backgroundColor: 'rgba(1, 17, 36, 0.75)',
+            }}>
+            <View style={styles.centeredView}>
+              <View style={styles.modalView}>
+                <Pressable
+                  style={{
+                    marginRight: 0,
+                    backgroundColor: '#fff',
+                    padding: 5,
+                  }}
+                  onPress={() => {
+                    setModalVisible(false);
+                    navigation.replace('HomeScreen');
+                  }}>
+                  <Text
+                    style={{
+                      textAlign: 'right',
+                      fontSize: 20,
+                      fontWeight: '700',
+                    }}>
+                    X
+                  </Text>
+                </Pressable>
+                <View
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                  }}>
+                  <Image
+                    source={done}
+                    resizeMode="contain"
+                    style={{
+                      width: 24,
+                      height: 24,
+                      aspectRatio: 1,
+                      marginTop: 0,
+                      marginRight: 3,
+                    }}
+                  />
+                  <Text
+                    style={{color: '#27AE60', fontWeight: '700', fontSize: 18}}>
+                    Well Done!
+                  </Text>
+                </View>
+                <Text style={{color: '#0695E3'}}>
+                  You are successfully submitted the report
+                </Text>
+              </View>
+            </View>
+          </View>
+        </Modal>
+      )}
       <View contentInsetAdjustmentBehavior="automatic" style={{height: 320}}>
         <ImageBackground
           source={image1}
@@ -332,6 +411,7 @@ const ReportBoardScreen = ({navigation}) => {
                   fontWeight: '400',
                   color: '#5C5F69',
                   marginBottom: 20,
+                  marginHorizontal: 20,
                 }}>
                 If you have facing any problem? Report this, we will take action
                 as soon.
@@ -377,16 +457,34 @@ const ReportBoardScreen = ({navigation}) => {
                 }}>
                 {!scannedQr ? (
                   <View>
+                    {DriverInfo?.busNumber == null && scannedError ? (
+                      <Text
+                        style={{
+                          color: '#FF3370',
+                          textAlign: 'center',
+                          marginBottom: 5,
+                        }}>
+                        {' '}
+                        Please scan QR first
+                      </Text>
+                    ) : null}
                     <View
                       style={{
                         display: 'flex',
                         flexDirection: 'row',
                         alignItems: 'center',
-
                         marginLeft: 0,
                         marginBottom: 17,
                       }}>
-                      <Text>QR code No* :</Text>
+                      <Text
+                        style={{
+                          color: '#4F4F4F',
+                          fontSize: 12,
+                          fontWeight: '400',
+                          width: '33%',
+                        }}>
+                        QR code No* :
+                      </Text>
                       <Pressable
                         style={{
                           display: 'flex',
@@ -394,6 +492,7 @@ const ReportBoardScreen = ({navigation}) => {
                           alignItems: 'center',
                           justifyContent: 'center',
                           marginLeft: 10,
+                          width: '63%',
                         }}>
                         <Text
                           style={{
@@ -406,7 +505,7 @@ const ReportBoardScreen = ({navigation}) => {
                             borderWidth: 1,
                             borderColor: '#E0E0E0',
                             height: 30,
-                            width: 88,
+                            width: '50%',
                           }}>
                           {DriverInfo.busNumber
                             ? `${DriverInfo?.busNumber[1].substring(0, 2)}*****`
@@ -421,6 +520,7 @@ const ReportBoardScreen = ({navigation}) => {
                             color: '#fff',
                             borderRadius: 6,
                             borderWidth: 1,
+                            width: '50%',
                             borderColor: '#00D253',
                           }}
                           onPress={() => setscanQr(true)}>
@@ -437,7 +537,15 @@ const ReportBoardScreen = ({navigation}) => {
                         marginLeft: 0,
                         marginBottom: 17,
                       }}>
-                      <Text>Report Type*</Text>
+                      <Text
+                        style={{
+                          color: '#4F4F4F',
+                          fontSize: 12,
+                          fontWeight: '400',
+                          width: '25%',
+                        }}>
+                        Report Type*
+                      </Text>
 
                       <Controller
                         name="comment"
@@ -597,7 +705,12 @@ const ReportBoardScreen = ({navigation}) => {
                         onValueChange={setCheck}
                         style={{alignSelf: 'center'}}
                       />
-                      <Text style={{margin: 8}}>
+                      <Text
+                        style={{
+                          margin: 8,
+                          color:
+                            isCheckError && !isCheck ? '#FF3370' : '#455A64',
+                        }}>
                         I agree to submit this report.?
                       </Text>
                     </View>
@@ -851,6 +964,29 @@ const styles = StyleSheet.create({
   },
   buttonTouchable: {
     padding: 16,
+  },
+  centeredView: {
+    // flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    // alignItems: 'center',
+    shadowColor: '#000',
+    // width: 300,
+    // height: 400,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
   },
 });
 

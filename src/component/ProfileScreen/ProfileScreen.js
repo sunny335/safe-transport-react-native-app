@@ -24,8 +24,8 @@ import image1 from '../image/loginBg.png';
 import avatar from '../image/avatar.png';
 import DoubleRight from '../image/DoubleRight.png';
 
-import HomeImg from '../image/Home.png';
-import ProfileImg from '../image/QrCode.png';
+import HomeImg from '../image/homedefault.png';
+import ProfileImg from '../image/useactive.png';
 import QrCode from '../image/QrCode.png';
 
 const HEIGHT = Dimensions.get('window').height;
@@ -220,7 +220,13 @@ const ProfileScreen = ({navigation}) => {
                 }}>
                 Email :
               </Text>
-              <Text style={{color: '#27AE60', fontWeight: '700', fontSize: 18}}>
+              <Text
+                style={{
+                  color: '#27AE60',
+                  fontWeight: '700',
+                  fontSize: 18,
+                  flexShrink: 1,
+                }}>
                 {loggedIn.user && loggedIn?.user.email}
               </Text>
             </View>
@@ -265,7 +271,7 @@ const ProfileScreen = ({navigation}) => {
             />
             <Text
               style={{
-                color: '#27AE60',
+                color: '#4F4F4F',
                 fontSize: 12,
                 fontWeight: '700',
                 marginTop: 9,
@@ -274,7 +280,7 @@ const ProfileScreen = ({navigation}) => {
             </Text>
           </View>
         </Text>
-        <Text onPress={() => navigation.replace('HomeScreen')}>
+        <Text onPress={() => navigation.replace('scanQr')}>
           <View
             style={{
               width: 70,
@@ -300,7 +306,7 @@ const ProfileScreen = ({navigation}) => {
             />
           </View>
         </Text>
-        <Text onPress={() => navigation.replace('ProfileScreen')}>
+        <Text>
           <View style={{width: 37, textAlign: 'center'}}>
             <Image
               source={ProfileImg}
@@ -315,7 +321,7 @@ const ProfileScreen = ({navigation}) => {
             />
             <Text
               style={{
-                color: '#4F4F4F',
+                color: '#27AE60',
                 fontSize: 12,
                 fontWeight: '400',
                 marginTop: 9,
