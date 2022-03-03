@@ -19,6 +19,7 @@ import {
 } from 'react-native';
 import {t} from 'react-native-tailwindcss';
 import {useDispatch, useSelector} from 'react-redux';
+import Geocoder from 'react-native-geocoding';
 
 import image1 from '../image/loginBg.png';
 // import profile from '../image/profile.jpg';
@@ -43,7 +44,7 @@ var WIDTH = Dimensions.get('window').width;
 
 const HomeScreen = ({navigation}) => {
   const userauth = useSelector(state => state.userAuth);
-
+  Geocoder.init('AIzaSyDjBA1gOLI5tjsT2nxd15stwja0SSEWCfI');
   const dispatch = useDispatch();
   const isDarkMode = useColorScheme() === 'dark';
   const [loggedIn, setLoggedIn] = useState({});
@@ -81,6 +82,15 @@ const HomeScreen = ({navigation}) => {
   if (animating) {
     return <SplashScreen />;
   }
+
+  const getlocation = () => {
+    Geocoder.from(23.8103, 90.4125)
+      .then(json => {
+        var addressComponent = json.results[0].address_components[0];
+        console.log(addressComponent);
+      })
+      .catch(error => console.warn(error));
+  };
 
   return (
     <View
@@ -130,7 +140,8 @@ const HomeScreen = ({navigation}) => {
                     fontSize: 15,
                     fontWeight: '700',
                     textTransform: 'uppercase',
-                  }}>
+                  }}
+                  onPress={() => getlocation()}>
                   {loggedIn?.user?.firstName &&
                     loggedIn?.user?.firstName + ' ' + loggedIn?.user.lastName}
                 </Text>

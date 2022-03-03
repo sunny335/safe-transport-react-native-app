@@ -280,7 +280,7 @@ const ScanQrCode = ({navigation}) => {
                 }}>
                 {qrCodeData?.data ? (
                   <View>
-                    {QrbackendData.length > 0 &&
+                    {QrbackendData?.length > 0 &&
                       QrbackendData.map(items => (
                         <View
                           style={[

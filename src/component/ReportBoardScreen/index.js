@@ -143,11 +143,14 @@ const ReportBoardScreen = ({navigation}) => {
       );
     }
   }, [DriverInfo]);
+
   let QrbackendData = [];
   QrbackendData =
     DriverInfo?.busNumber &&
-    QrData?.posts.filter(item => item.busNumber == DriverInfo?.busNumber[1]);
-  // console.log('==============', QrbackendData);
+    posts?.posts?.posts.filter(
+      item => item.busNumber == DriverInfo?.busNumber[1],
+    );
+  // console.log('============== qr backedn', DriverInfo?.busNumber[1]);
 
   // photo seleact
   const selectPhotoTapped = () => {
@@ -200,7 +203,7 @@ const ReportBoardScreen = ({navigation}) => {
   // form submit
 
   const onSubmit = data => {
-    console.log(data, ' Report Data==========');
+    // console.log(QrData.posts, ' Report Data==========');
     // ReportType:selectedValue,
     // isCheck
     // reportedPhoto: BusownerImage.avatarSource,
