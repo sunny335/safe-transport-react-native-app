@@ -325,64 +325,67 @@ const HomeScreen = ({navigation}) => {
                 />
               </View>
             </Pressable>
-            <View
-              style={{
-                display: 'flex',
-                // flex: 1,
-                flexDirection: 'row',
-                alignItems: 'center',
-                marginBottom: 20,
-                paddingTop: 12,
-                paddingBottom: 12,
-                paddingLeft: 12,
-                paddingRight: 12,
-                shadowColor: '#000',
-                shadowOffset: {width: 3, height: 3},
-                shadowOpacity: 1,
-                shadowRadius: 7,
-                elevation: 3,
-                borderRadius: 15,
-                backgroundColor: '#fff',
-                width: WIDTH - 74,
-              }}>
-              <Image
-                source={contact}
-                resizeMode="contain"
+            <Pressable
+              onPress={() => navigation.navigate('EmergencyContactScreen')}>
+              <View
                 style={{
-                  width: 60,
-                  height: 55,
-                  aspectRatio: 1,
-                  marginTop: 0,
-                  marginRight: 18,
-                }}
-              />
-              <View style={{maxWidth: 200}}>
-                <Text
+                  display: 'flex',
+                  // flex: 1,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  marginBottom: 20,
+                  paddingTop: 12,
+                  paddingBottom: 12,
+                  paddingLeft: 12,
+                  paddingRight: 12,
+                  shadowColor: '#000',
+                  shadowOffset: {width: 3, height: 3},
+                  shadowOpacity: 1,
+                  shadowRadius: 7,
+                  elevation: 3,
+                  borderRadius: 15,
+                  backgroundColor: '#fff',
+                  width: WIDTH - 74,
+                }}>
+                <Image
+                  source={contact}
+                  resizeMode="contain"
                   style={{
-                    color: '#0F254F',
-                    fontSize: 14,
-                    marginBottom: 4,
-                    fontWeight: '700',
-                  }}>
-                  Emergency Contact
-                </Text>
-                <Text style={{color: '#5C5F69', fontSize: 12}}>
-                  You can used upto 5 emergency number, Who person get
-                  notification.
-                </Text>
+                    width: 60,
+                    height: 55,
+                    aspectRatio: 1,
+                    marginTop: 0,
+                    marginRight: 18,
+                  }}
+                />
+                <View style={{maxWidth: 200}}>
+                  <Text
+                    style={{
+                      color: '#0F254F',
+                      fontSize: 14,
+                      marginBottom: 4,
+                      fontWeight: '700',
+                    }}>
+                    Emergency Contact
+                  </Text>
+                  <Text style={{color: '#5C5F69', fontSize: 12}}>
+                    You can used upto 5 emergency number, Who person get
+                    notification.
+                  </Text>
+                </View>
+                <Image
+                  source={IconRight}
+                  resizeMode="contain"
+                  style={{
+                    width: 24,
+                    height: 24,
+                    aspectRatio: 1,
+                    marginTop: 0,
+                    marginLeft: 'auto',
+                  }}
+                />
               </View>
-              <Image
-                source={IconRight}
-                resizeMode="contain"
-                style={{
-                  width: 24,
-                  height: 24,
-                  aspectRatio: 1,
-                  marginTop: 0,
-                  marginLeft: 'auto',
-                }}
-              />
-            </View>
+            </Pressable>
             <Pressable onPress={() => navigation.navigate('ReportHistory')}>
               <View
                 style={{

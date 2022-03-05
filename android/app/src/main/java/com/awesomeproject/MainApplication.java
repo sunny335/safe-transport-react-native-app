@@ -16,6 +16,7 @@ import com.rnfs.RNFSPackage;
 import com.reactnativecommunity.cameraroll.CameraRollPackage;
 import com.facebook.react.bridge.JSIModulePackage;
 import com.swmansion.reanimated.ReanimatedJSIModulePackage;
+import com.react.SmsPackage;
 
 public class MainApplication extends Application implements ReactApplication {
 
@@ -51,6 +52,7 @@ public class MainApplication extends Application implements ReactApplication {
   protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
         new MainReactPackage(),
+        new SmsPackage(),
         new RNFSPackage()
       );
     }

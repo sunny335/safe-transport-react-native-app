@@ -6783,6 +6783,11 @@ react-native-codegen@^0.0.7:
     jscodeshift "^0.11.0"
     nullthrows "^1.1.1"
 
+react-native-communications@^2.2.1:
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/react-native-communications/-/react-native-communications-2.2.1.tgz#7883b56b20a002eeb790c113f8616ea8692ca795"
+  integrity sha1-eIO1ayCgAu63kMET+GFuqGksp5U=
+
 react-native-fs@^2.18.0:
   version "2.18.0"
   resolved "https://registry.yarnpkg.com/react-native-fs/-/react-native-fs-2.18.0.tgz#987b99cc90518ef26663a8d60e62104694b41c21"
@@ -6805,6 +6810,11 @@ react-native-gesture-handler@1.5.3:
     hoist-non-react-statics "^2.3.1"
     invariant "^2.2.4"
     prop-types "^15.7.2"
+
+react-native-get-sms-android@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/react-native-get-sms-android/-/react-native-get-sms-android-2.1.0.tgz#0b04bd017f6e7f8a3c1ac9e61960e73d76750be0"
+  integrity sha512-yYPlJ4DkuC9HnUL0ni644pDjRFnSQkdGHowIY5ab56YFDKHIEZ1rKuBCEbCWF0HALyvH6qCyfdHqwpzTtIj97w==
 
 react-native-gradle-plugin@^0.0.3:
   version "0.0.3"
@@ -6887,6 +6897,11 @@ react-native-screens@^3.12.0, react-native-screens@^3.4.0:
     react-freeze "^1.0.0"
     react-native-gradle-plugin "^0.0.3"
     warn-once "^0.1.0"
+
+react-native-sms@^1.11.0:
+  version "1.11.0"
+  resolved "https://registry.yarnpkg.com/react-native-sms/-/react-native-sms-1.11.0.tgz#02e191ef35fae163d7fae1f78f42f202c33f8c9e"
+  integrity sha512-G5q61qGknNyftN1cFkXfH46UkQWMf3fy/M1fxK/QJzLDJAgCSeBqge62FgJClw1FqzYGSjZeoZvkgpWGDCd3wQ==
 
 react-native-svg@^12.1.1:
   version "12.1.1"

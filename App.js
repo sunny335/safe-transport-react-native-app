@@ -32,6 +32,7 @@ import GeneratedQr from './src/component/ViewGeneratedQrScreen';
 import BusAndDriverInfo from './src/component/BusAndDriverInfo';
 import ReportBoardScreen from './src/component/ReportBoardScreen';
 import ReportHistory from './src/component/ReportHistoryScreen';
+import EmergencyContactScreen from './src/component/EmergencyContact';
 
 const App: () => Node = () => {
   const isDarkMode = useColorScheme() === 'dark';
@@ -131,6 +132,11 @@ const App: () => Node = () => {
               name="ReportHistory"
               component={ReportHistory}
               options={{title: 'ReportHistory'}}
+            />
+            <Stack.Screen
+              name="EmergencyContactScreen"
+              component={EmergencyContactScreen}
+              options={{title: 'EmergencyContactScreen'}}
             />
           </>
         ) : (
