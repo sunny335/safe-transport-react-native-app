@@ -18,20 +18,27 @@ import {
   Pressable,
   TouchableOpacity,
   PermissionsAndroid,
+  Modal,
 } from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
+import {CreateEmergencyPhone} from '../actions/emergency.actions';
+import {useForm, Controller} from 'react-hook-form';
 // import SendSMS from 'react-native-sms';
 
 import SmsAndroid from 'react-native-get-sms-android';
-
+import InputBox from '../EmergencyInputField';
 import image1 from '../image/loginBg.png';
 // import profile from '../image/profile.jpg';
 import avatar from '../image/avatar.png';
+import Vector2 from '../image/Vector2.png';
+import Emergency from '../image/emergency.png';
+import Delete from '../image/delete.png';
 import DoubleRight from '../image/DoubleRight.png';
 
 import HomeImg from '../image/homedefault.png';
 import ProfileImg from '../image/useactive.png';
+import Vector from '../image/Vector.png';
 import QrCode from '../image/QrCode.png';
 
 const HEIGHT = Dimensions.get('window').height;
@@ -40,12 +47,21 @@ const HEIGHT = Dimensions.get('window').height;
 
 const EmergencyContactScreen = ({navigation}) => {
   // const userauth = useSelector(state => state.userAuth);
+  const dispatch = useDispatch();
   const isDarkMode = useColorScheme() === 'dark';
   const [loggedIn, setLoggedIn] = useState({});
   const [voices, setVoice] = useState('initial');
+  const [modalVisible, setModalVisible] = useState(false);
+  const [EmergencyPhone, setEmergencyPhone] = useState([]);
+  const [EmergencyData, setEmergencyData] = useState([]);
   const backgroundStyle = {
     backgroundColor: isDarkMode ? '#ffff' : '#ffff',
   };
+  const {
+    handleSubmit,
+    control,
+    formState: {errors},
+  } = useForm();
 
   const userFormLogin = async () => {
     const loggedIna = await AsyncStorage.getItem('UserData');
@@ -98,36 +114,7 @@ const EmergencyContactScreen = ({navigation}) => {
   const [mobileNumber, setMobileNumber] = useState(['01967487507']);
   const [Message, setMessage] = useState('I am On danger');
 
-  // const sendingSms = (Receivers, Messagex) => {
-  //   try {
-  //     Receivers.map(
-  //       async Numbers =>
-  //         await SmsAndroid.sms(
-  //           Numbers,
-  //           Messagex,
-  //           'sendDirect',
-  //           (err, message) => {
-  //             if (err) {
-  //               console.log(err);
-  //             } else {
-  //               console.log(message);
-  //             }
-  //           },
-  //         ),
-  //     );
-  //   } catch (e) {
-  //     alert('' + e);
-  //   }
-  // };
-
   const sendingSms = (Receivers, Messagex) => {
-    const granted = PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.SEND_SMS,
-      {
-        title: 'Example App SEND_SMS Permission',
-        message: 'Example App needs access to your SEND_SMS',
-      },
-    );
     try {
       Receivers.map(
         async Numbers =>
@@ -147,16 +134,41 @@ const EmergencyContactScreen = ({navigation}) => {
     }
   };
 
-  // SmsAndroid.autoSend(
-  //     Receivers,
-  //     Messagex,
-  //     fail => {
-  //       console.log('Failed with this error: ' + fail);
-  //     },
-  //     success => {
-  //       console.log('SMS sent successfully');
-  //     },
-  //   );
+  const userEmergencyPhone = async () => {
+    const loggedIna = await AsyncStorage.getItem('emergencyStorageData');
+    setEmergencyPhone(JSON.parse(loggedIna));
+    const emergencyData = await AsyncStorage.getItem('emergencyFulleData');
+    setEmergencyData(JSON.parse(emergencyData));
+  };
+
+  const onSubmit = data => {
+    mobileNumber.push(data.Phone);
+    EmergencyData.push(data);
+    AsyncStorage.setItem('emergencyStorageData', JSON.stringify(mobileNumber));
+    AsyncStorage.setItem('emergencyFulleData', JSON.stringify(EmergencyData));
+    // EmergencyPhoneChanges.push(data.Phone);
+    userEmergencyPhone();
+    dispatch(
+      CreateEmergencyPhone({
+        ...data,
+        UserID: loggedIn.user._id,
+      }),
+    );
+    console.log({data});
+  };
+
+  const validate = (value: string) => {
+    const matches = value.match(
+      /^(?:0\.(?:0[0-9]|[0-9]\d?)|[0-9]\d*(?:\.\d{1,2})?)(?:e[+-]?\d+)?$/,
+    );
+    return matches?.length || 'String is not a number';
+  };
+
+  useEffect(() => {
+    userEmergencyPhone();
+  }, [mobileNumber]);
+  console.log('emergency=====', EmergencyData);
+
   return (
     <View
       style={{
@@ -164,6 +176,181 @@ const EmergencyContactScreen = ({navigation}) => {
         position: 'relative',
         backgroundColor: '#fff',
       }}>
+      {modalVisible && (
+        <Modal
+          animationType="slide"
+          visible={modalVisible}
+          transparent={true}
+          onRequestClose={() => {
+            Alert.alert('Modal has been closed.');
+            setModalVisible(false);
+          }}>
+          <View
+            style={{
+              flex: 1,
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'center',
+              backgroundColor: 'rgba(1, 17, 36, 0.75)',
+            }}>
+            <View style={styles.centeredView}>
+              <View style={styles.modalView}>
+                <View
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignContent: 'center',
+                    marginBottom: 15,
+                  }}>
+                  <Image
+                    source={Vector2}
+                    resizeMode="contain"
+                    style={{
+                      width: 12,
+                      height: 12,
+                      // aspectRatio: 1,
+                      marginTop: 0,
+                      marginRight: 3,
+                    }}
+                  />
+                  <Text
+                    style={{
+                      color: '#27AE60',
+                      fontWeight: '700',
+                      fontSize: 14,
+                      margin: 0,
+                      marginBottom: 3,
+                    }}>
+                    Add Your Contact Number
+                  </Text>
+                </View>
+                <View>
+                  <Controller
+                    name="Name"
+                    control={control}
+                    defaultValue=""
+                    rules={{
+                      required: {
+                        value: true,
+                        message: 'please enter name',
+                      },
+                    }}
+                    render={({field: {onChange, onBlur, value, Name, ref}}) => (
+                      <InputBox
+                        onChangeText={value => onChange(value)}
+                        value={value}
+                        label="Full Name"
+                        error={errors?.Name}
+                        errorText={errors?.Name?.message}
+                      />
+                    )}
+                  />
+                  <Controller
+                    name="Phone"
+                    control={control}
+                    defaultValue=""
+                    rules={{
+                      required: {
+                        value: true,
+                        message: 'please enter  Phone number',
+                      },
+                      minLength: {
+                        value: 11,
+                        message: 'Phone number length must be 11',
+                      },
+                      maxLength: {
+                        value: 11,
+                        message: 'Phone number max length can be 11',
+                      },
+                      validate,
+                    }}
+                    error={{
+                      type: String,
+                      message: 'please enter valid Phone number',
+                    }}
+                    render={({field: {onChange, onBlur, value, Name, ref}}) => (
+                      <InputBox
+                        onChangeText={value => onChange(value)}
+                        value={value}
+                        label="Phone Number"
+                        error={errors?.Phone}
+                        errorText={errors?.Phone?.message}
+                      />
+                    )}
+                  />
+                  <Controller
+                    name="Email"
+                    control={control}
+                    defaultValue=""
+                    rules={{
+                      required: {
+                        value: true,
+                        message: 'please enter Email',
+                      },
+                    }}
+                    render={({field: {onChange, onBlur, value, Name, ref}}) => (
+                      <InputBox
+                        onChangeText={value => onChange(value)}
+                        value={value}
+                        label="Email Address"
+                        error={errors?.Email}
+                        errorText={errors?.Email?.message}
+                      />
+                    )}
+                  />
+                </View>
+                <View
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignContent: 'center',
+                  }}>
+                  <Pressable
+                    style={{
+                      marginRight: 10,
+                      backgroundColor: '#fff',
+                      paddingVertical: 5,
+                      paddingHorizontal: 10,
+                      marginTop: 20,
+                      width: 70,
+                      borderRadius: 5,
+                      borderWidth: 1,
+                      borderColor: '#27AE60',
+                      backgroundColor: '#27AE60',
+                    }}
+                    onPress={handleSubmit(onSubmit)}>
+                    <Text style={{color: '#fff', paddingHorizontal: 7}}>
+                      Add
+                    </Text>
+                  </Pressable>
+                  <Pressable
+                    style={{
+                      marginRight: 10,
+                      backgroundColor: '#fff',
+                      paddingVertical: 5,
+                      paddingHorizontal: 10,
+                      marginTop: 20,
+                      width: 70,
+                      borderRadius: 5,
+                      borderWidth: 1,
+                      borderColor: '#FF3370',
+                    }}
+                    onPress={() => {
+                      setModalVisible(false);
+                    }}>
+                    <Text
+                      style={{
+                        color: '#FF3370',
+                      }}>
+                      Cancle
+                    </Text>
+                  </Pressable>
+                </View>
+              </View>
+            </View>
+          </View>
+        </Modal>
+      )}
       {/* <StatusBar barStyle={isDarkMode ? '#fff' : 'dark-content'} /> */}
       <View contentInsetAdjustmentBehavior="automatic" style={{height: 320}}>
         <ImageBackground
@@ -250,15 +437,35 @@ const EmergencyContactScreen = ({navigation}) => {
           </Text>
         </ImageBackground>
       </View>
-      <View
-        style={{
-          height: HEIGHT - 320,
-          maxHeight: HEIGHT - 320,
-        }}>
+      <View>
+        <View style={{marginBottom: 17}}>
+          <Text
+            style={{
+              textAlign: 'center',
+              color: '#0F254F',
+              marginBottom: 14,
+              fontSize: 16,
+              fontWeight: '700',
+            }}>
+            Emergency Contact
+          </Text>
+          <Text
+            style={{
+              textAlign: 'center',
+              color: '#000000',
+              marginBottom: 14,
+              paddingHorizontal: 65,
+              fontSize: 12,
+              fontWeight: '400',
+            }}>
+            You can added up to 5 contact number. If you facing a problem when
+            traveling, that time we are sent the notification your near contact.
+          </Text>
+        </View>
         <View
           style={{
-            marginLeft: 37,
-            marginRight: 37,
+            marginLeft: 20,
+            marginRight: 20,
             // marginBottom: 30,
             shadowColor: '#000',
             shadowOffset: {width: 15, height: 15},
@@ -267,62 +474,209 @@ const EmergencyContactScreen = ({navigation}) => {
             elevation: 5,
             borderRadius: 15,
             backgroundColor: '#fff',
-            paddingHorizontal: 20,
+            paddingHorizontal: 15,
             paddingVertical: 20,
           }}>
           <ScrollView>
-            {/* <View>
-              <Text>Emergency Contact</Text>
-              <Pressable>
-                <Text style={{padding: 10, backgroundColor: '#ddd'}}>
-                  Start
+            <View>
+              <View
+                style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                <Text
+                  style={{
+                    textAlign: 'center',
+                    color: '#0F254F',
+                    fontSize: 16,
+                    fontWeight: '700',
+                  }}>
+                  My Contact
                 </Text>
-              </Pressable>
-              <Text>{voices}</Text>
-            </View> */}
-            {/* <View style={styles.container}>
-              <Text style={styles.titleText}>
-                Example to Send Text SMS on Button Click in React Native
-              </Text>
-              <Text style={styles.titleTextsmall}>Enter Mobile Number</Text>
-              <TextInput
-                value={mobileNumber}
-                onChangeText={mobileNumber => setMobileNumber(mobileNumber)}
-                placeholder={'Enter Conatct Number to Call'}
-                keyboardType="numeric"
-                style={styles.textInput}
-              />
-              <Text style={styles.titleTextsmall}>Enter SMS body</Text>
-              <TextInput
-                value={bodySMS}
-                onChangeText={bodySMS => setBodySMS(bodySMS)}
-                placeholder={'Enter SMS body'}
-                style={styles.textInput}
-              />
-              <TouchableOpacity
-                activeOpacity={0.7}
-                style={styles.buttonStyle}
-                onPress={initiateSMS}>
-                <Text style={styles.buttonTextStyle}>Send Message</Text>
-              </TouchableOpacity>
-            </View> */}
-            <View style={styles.container}>
-              <TextInput
+                <Pressable
+                  style={{
+                    flexDirection: 'row',
+                    backgroundColor: '#00D253',
+                    alignItems: 'center',
+                    padding: 6,
+                    paddingHorizontal: 12,
+                    borderRadius: 5,
+                    shadowColor: '#000',
+                    shadowOffset: {width: 10, height: 10},
+                    shadowOpacity: 10,
+                    shadowRadius: 20,
+                    elevation: 4,
+                  }}
+                  onPress={() => setModalVisible(true)}>
+                  <Image
+                    source={Vector}
+                    resizeMode="contain"
+                    style={{
+                      width: 9,
+                      height: 10,
+                      // aspectRatio: 1,
+                      marginRight: 8,
+                      // marginLeft: 'auto',
+                    }}
+                  />
+                  <Text style={{color: '#fff', fontWeight: '600'}}>Add</Text>
+                </Pressable>
+              </View>
+              <View
                 style={{
-                  height: 40,
-                  borderColor: 'gray',
-                  borderWidth: 1,
-                  width: '90%',
-                }}
-                onChangeText={Message => setMessage(Message)}
-                value={Message}
-              />
-              <Button
-                title="SEND"
-                onPress={() => sendingSms(mobileNumber, Message)}
-              />
+                  height: HEIGHT - 700,
+                  maxHeight: HEIGHT - 700,
+                }}>
+                <ScrollView>
+                  {EmergencyData.length > 0 ? (
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        backgroundColor: '#2EC16C',
+                        alignItems: 'center',
+                        padding: 6,
+                        marginTop: 10,
+                      }}>
+                      <Text
+                        style={{
+                          width: '25%',
+                          color: '#fff',
+                          fontWeight: '700',
+                        }}>
+                        Name
+                      </Text>
+                      <Text
+                        style={{
+                          width: '25%',
+                          color: '#fff',
+                          fontWeight: '700',
+                        }}>
+                        Phone No
+                      </Text>
+                      <Text
+                        style={{
+                          width: '25%',
+                          color: '#fff',
+                          textAlign: 'center',
+                          fontWeight: '700',
+                        }}>
+                        E-mail
+                      </Text>
+                      <Text
+                        style={{
+                          width: '25%',
+                          color: '#fff',
+                          textAlign: 'right',
+                          fontWeight: '700',
+                        }}>
+                        Action
+                      </Text>
+                    </View>
+                  ) : (
+                    <Text>You have not created any report yet</Text>
+                  )}
+
+                  {EmergencyData.length > 0 &&
+                    EmergencyData.map((item, i) => (
+                      <View
+                        key={i}
+                        style={{
+                          flexDirection: 'row',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          backgroundColor: i % 2 === 0 ? '#D6FFE7' : '#D6F5FF',
+                          padding: 6,
+                          marginBottom: 2,
+                        }}>
+                        <Text style={{width: '25%', color: '#000000'}}>
+                          {i} {item.Name}
+                        </Text>
+                        <Text style={{width: '35%', color: '#000000'}}>
+                          {item.Phone}
+                        </Text>
+
+                        <Text style={{width: '35%', color: '#000000'}}>
+                          {item.Email}
+                        </Text>
+                        <Text style={{width: '5%', color: '#000000'}}>
+                          <Image
+                            source={Delete}
+                            resizeMode="contain"
+                            style={{
+                              width: 12,
+                              height: 12,
+                              // aspectRatio: 1,
+                              marginTop: 0,
+                              marginRight: 3,
+                            }}
+                          />
+                        </Text>
+                      </View>
+                    ))}
+                  {/* <TextInput
+                  style={{
+                    height: 40,
+                    borderColor: 'gray',
+                    borderWidth: 1,
+                    width: '90%',
+                  }}
+                  onChangeText={Message => setMessage(Message)}
+                  value={Message}
+                /> */}
+                </ScrollView>
+              </View>
             </View>
           </ScrollView>
+        </View>
+      </View>
+      <View>
+        <Text
+          style={{
+            textAlign: 'center',
+            paddingHorizontal: 35,
+            marginTop: 30,
+            color: '#000000',
+          }}>
+          We are sent the mesage Instally with location to your every contact
+          number when you are used this “Emegency Button’
+        </Text>
+        <View>
+          <Pressable
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'center',
+              marginTop: 20,
+            }}
+            onPress={() => sendingSms(mobileNumber, Message)}>
+            <View
+              style={{
+                backgroundColor: '#D2007E',
+                height: 39,
+                width: '50%',
+                borderRadius: 15,
+                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'center',
+                shadowColor: '#000',
+                shadowOffset: {width: 15, height: 15},
+                shadowOpacity: 10,
+                shadowRadius: 20,
+                elevation: 8,
+              }}>
+              <Image
+                source={Emergency}
+                resizeMode="contain"
+                style={{
+                  width: 20,
+                  height: 20,
+                  // aspectRatio: 1,
+                  marginTop: 0,
+                  marginRight: 23,
+                }}
+              />
+              <Text style={{fontSize: 16, color: '#fff', fontWeight: '700'}}>
+                Emergency use
+              </Text>
+            </View>
+          </Pressable>
         </View>
       </View>
       <View
@@ -507,6 +861,27 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     width: '100%',
     paddingHorizontal: 10,
+  },
+  centeredView: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+
+    shadowColor: '#000',
+
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
   },
 });
 

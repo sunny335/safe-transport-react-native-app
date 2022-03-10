@@ -14,6 +14,7 @@ import {
   StyleSheet,
   useColorScheme,
   StatusBar,
+  PermissionsAndroid,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -33,12 +34,15 @@ import BusAndDriverInfo from './src/component/BusAndDriverInfo';
 import ReportBoardScreen from './src/component/ReportBoardScreen';
 import ReportHistory from './src/component/ReportHistoryScreen';
 import EmergencyContactScreen from './src/component/EmergencyContact';
+import OtpScreen from './src/component/OtpScreen';
 
 const App: () => Node = () => {
   const isDarkMode = useColorScheme() === 'dark';
   const auth = useSelector(state => state.userAuth);
   const [loggedIn, setLoggedIn] = useState(false);
+  const [OTP, setOtp] = useState(false);
   const [animating, setAnimating] = useState(true);
+  const [location, setLocation] = useState(true);
   const backgroundStyle = {
     backgroundColor: isDarkMode ? '#ffff' : '#ffff',
     height: '100%',
@@ -58,8 +62,44 @@ const App: () => Node = () => {
       setLoggedIn(false);
     }
   };
+
+  const isOTPValid = async () => {
+    const otp = await AsyncStorage.getItem('OTP');
+    console.log('opttttttpppppppppp', otp);
+    if (otp == 'valid') {
+      setOtp(true);
+    } else {
+      setOtp(false);
+    }
+  };
+  // const chckLocationPermission = PermissionsAndroid.check(
+  //   PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+  // );
+  // console.log('loaction permission', chckLocationPermission);
+  const HandleLocation = async () => {
+    const result = await PermissionsAndroid.check(
+      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+    );
+    // const chckLocationPermission = PermissionsAndroid.check(
+    //   PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+    // );
+    console.log('loaction permission===========', result);
+    if (result === true) {
+      setLocation(false);
+      // console.log('You can use the location');
+    } else {
+      setLocation(true);
+      // console.log('location permission denied');
+    }
+  };
+
   useEffect(() => {
     isLogged();
+    HandleLocation();
+  }, []);
+
+  useEffect(() => {
+    isOTPValid();
   }, []);
 
   useEffect(() => {
@@ -74,6 +114,12 @@ const App: () => Node = () => {
   if (animating) {
     return <SplashScreen />;
   }
+  // console.log('{OTP', loggedIn);
+
+  // useEffect(() => {
+
+  // }, []);
+
   return (
     <NavigationContainer>
       <Stack.Navigator
@@ -87,17 +133,33 @@ const App: () => Node = () => {
         /> */}
         {loggedIn ? (
           <>
+            {OTP ? null : <Stack.Screen name="OTP" component={OtpScreen} />}
+
+            {location ? (
+              <Stack.Screen
+                name="Location"
+                component={Location}
+                options={{title: 'Location'}}>
+                {' '}
+                {props => <HomeScreen {...props} otherProp={otherProp} />}
+              </Stack.Screen>
+            ) : null}
+
+            {/* <Stack.Screen
+              name={`${OTP ? 'Location' : 'OtpScreen'}`}
+              component={OTP ? Location : OtpScreen}
+            /> */}
             <Stack.Screen
               name="HomeScreen"
               component={HomeScreen}
               options={{title: 'HomeScreen'}}
             />
 
-            <Stack.Screen
+            {/* <Stack.Screen
               name="Location"
               component={Location}
               options={{title: 'Location'}}
-            />
+            /> */}
             <Stack.Screen
               name="generateQr"
               component={GenerateQr}

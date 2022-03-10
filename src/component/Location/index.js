@@ -14,6 +14,7 @@ import {
   Button,
   ImageBackground,
   Image,
+  PermissionsAndroid,
 } from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
@@ -27,6 +28,28 @@ const Location = ({navigation}) => {
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? '#ffff' : '#ffff',
+  };
+
+  const HandleLocation = async () => {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+        {
+          title: 'Example App',
+          message: 'Example App access to your location ',
+        },
+      );
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        // console.log('You can use the location');
+        // alert('You can use the location');
+        navigation.navigate('HomeScreen', {name: 'HomeScreen'});
+      } else {
+        console.log('location permission denied');
+        alert('Location permission denied');
+      }
+    } catch (err) {
+      console.warn(err);
+    }
   };
 
   return (
@@ -131,7 +154,8 @@ const Location = ({navigation}) => {
                 borderRadius: 45,
                 marginRight: 12,
                 textAlign: 'center',
-              }}>
+              }}
+              onPress={HandleLocation}>
               enable
             </Text>
             <Text

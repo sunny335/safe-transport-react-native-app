@@ -16,6 +16,7 @@ import {
   Image,
   Dimensions,
   Pressable,
+  PermissionsAndroid,
 } from 'react-native';
 import {t} from 'react-native-tailwindcss';
 import {useDispatch, useSelector} from 'react-redux';
@@ -82,6 +83,14 @@ const HomeScreen = ({navigation}) => {
   if (animating) {
     return <SplashScreen />;
   }
+
+  const granted = PermissionsAndroid.request(
+    PermissionsAndroid.PERMISSIONS.SEND_SMS,
+    {
+      title: 'Example App SEND_SMS Permission',
+      message: 'Example App needs access to your SEND_SMS',
+    },
+  );
 
   const getlocation = () => {
     Geocoder.from(23.8103, 90.4125)

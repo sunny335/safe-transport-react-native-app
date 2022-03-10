@@ -565,7 +565,7 @@ const MakeQr = ({navigation}) => {
               }}
               error={{
                 type: String,
-                message: 'please enter validh Phone number',
+                message: 'please enter valid Phone number',
               }}
               render={({field: {onChange, onBlur, value, name, ref}}) => (
                 <InputBox
