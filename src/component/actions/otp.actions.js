@@ -1,46 +1,50 @@
-import {
-  FETCH_BY_SEARCH,
-  FETCH_ALL,
-  FETCH_POST,
-  CREATE,
-  UPDATE,
-  DELETE,
-  LIKE,
-  START_LOADING,
-  END_LOADING,
-  COMMENT,
-  CLEAR_POST,
-} from '../constants/actionTypes';
+import axios from '../helpers/axios';
+import {userAuthVerifyConstants} from './constants';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// import * as api from '../api/index';
-import api from '../helpers/axios.js';
+export const UserloginRequesr = phone => {
+  // console.log('userLogin From user auth', user);
+  return async dispatch => {
+    dispatch({type: userAuthVerifyConstants.OTP_REQUEST});
+    try {
+      const res = await axios.post('/signinrequest', {...phone});
+      const user = res.data;
 
-// export const clearPost = () => {
-//   return {type: CLEAR_POST};
-// };
+      await AsyncStorage.setItem('otpverify', JSON.stringify(user));
+      dispatch({
+        type: userAuthVerifyConstants.OTP_SUCCESS,
+        payload: {
+          user,
+        },
+      });
+    } catch (error) {
+      dispatch({
+        type: userAuthVerifyConstants.OTP_FAILURE,
+        payload: {error: error},
+      });
+    }
+  };
+};
 
-// export const getPosts = () => async dispatch => {
-//   try {
-//     dispatch({type: START_LOADING});
-//     // const { data } = await api.fetchPosts(page);
-//     const data = await api.get('/getQrdata');
-//     // const alldata = data;
-//     // console.log('dataaaaa', data);
-//     dispatch({type: FETCH_ALL, payload: data});
-//     dispatch({type: END_LOADING});
-//   } catch (error) {
-//     console.log(error.message);
-//   }
-// };
+export const userVerifyAndSign = data => {
+  // console.log('userLogin From user auth', user);
+  return async dispatch => {
+    dispatch({type: userAuthVerifyConstants.OTP_VERIFY_REQUEST});
+    try {
+      const res = await axios.post('/userVerifyAndSign', {...data});
+      const user = res.data;
 
-export const createPost = (otp, history) => async dispatch => {
-  try {
-    // const { data } = await api.createPost(post);
-    // const data = await api.post('/posts', post);
-    dispatch({type: CREATE, payload: otp});
-    console.log('create otp', otp);
-    // history.push(`posts/${data._id}`);
-  } catch (error) {
-    console.log(error.message);
-  }
+      dispatch({
+        type: userAuthVerifyConstants.OTP_VERIFY_SUCCESS,
+        payload: {
+          user,
+        },
+      });
+    } catch (error) {
+      dispatch({
+        type: userAuthVerifyConstants.OTP_VERIFY_FAILER,
+        payload: {error: error},
+      });
+    }
+  };
 };

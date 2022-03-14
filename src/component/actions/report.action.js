@@ -76,15 +76,15 @@ export const CreateReport = (post, history) => async dispatch => {
 //   }
 // };
 
-export const DeletePost = id => async dispatch => {
-  try {
-    const data = await api.DELETE_REPORT('/:id', post);
-    // await api.DELETE_REPORTPost(id);
-    dispatch({type: DELETE_REPORT, payload: id});
-  } catch (error) {
-    console.log(error);
-  }
-};
+// export const DeletePost = id => async dispatch => {
+//   try {
+//     const data = await api.DELETE_REPORT('/:id', post);
+//     // await api.DELETE_REPORTPost(id);
+//     dispatch({type: DELETE_REPORT, payload: id});
+//   } catch (error) {
+//     console.log(error);
+//   }
+// };
 
 // export const likePost = id => async dispatch => {
 //   try {

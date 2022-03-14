@@ -10,12 +10,13 @@ import {
 
 // import * as api from '../api/index';
 import api from '../helpers/axios.js';
+import axios from '../helpers/axios';
 
 export const clearPost = () => {
   return {type: CLEAR_REPORT};
 };
 
-export const getPosts = () => async dispatch => {
+export const getPhones = () => async dispatch => {
   try {
     dispatch({type: START_REPORT_LOADING});
     // const { data } = await api.fetchPosts(page);
@@ -29,7 +30,7 @@ export const getPosts = () => async dispatch => {
   }
 };
 
-export const getPost = id => async dispatch => {
+export const getPhone = id => async dispatch => {
   try {
     dispatch({type: START_REPORT_LOADING});
     const {data} = await api.fetchPost(id);
@@ -76,9 +77,9 @@ export const CreateEmergencyPhone = (post, history) => async dispatch => {
 //   }
 // };
 
-export const DeletePost = id => async dispatch => {
+export const DeletePhone = id => async dispatch => {
   try {
-    const data = await api.DELETE_REPORT('/:id', post);
+    const data = await api.delete(`/${id}`);
     // await api.DELETE_REPORTPost(id);
     dispatch({type: DELETE_REPORT, payload: id});
   } catch (error) {

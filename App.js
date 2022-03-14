@@ -139,10 +139,8 @@ const App: () => Node = () => {
               <Stack.Screen
                 name="Location"
                 component={Location}
-                options={{title: 'Location'}}>
-                {' '}
-                {props => <HomeScreen {...props} otherProp={otherProp} />}
-              </Stack.Screen>
+                options={{title: 'Location'}}
+              />
             ) : null}
 
             {/* <Stack.Screen

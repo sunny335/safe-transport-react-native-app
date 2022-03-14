@@ -31,6 +31,33 @@ export const Userlogin = userData => {
   };
 };
 
+// export const UserloginRequesr = phone => {
+//   // console.log('userLogin From user auth', user);
+//   return async dispatch => {
+//     // dispatch({ type: userAuthConstants.LOGIN_REQUEST });
+//     try {
+//       const res = await axios.post('/signinrequest', {...phone});
+//       if (res.status === 200) {
+//         const user = res.data;
+//         await AsyncStorage.setItem('publicToken', token);
+//         await AsyncStorage.setItem('publicUser', JSON.stringify(user));
+//         dispatch({
+//           type: userAuthConstants.LOGIN_SUCCESS,
+//           payload: {
+//             token,
+//             user,
+//           },
+//         });
+//       }
+//     } catch (error) {
+//       dispatch({
+//         type: userAuthConstants.LOGIN_FAILURE,
+//         payload: {error: error},
+//       });
+//     }
+//   };
+// };
+
 export const isUserFormLoggedIn = () => {
   return async dispatch => {
     const token = AsyncStorage.getItem('publicToken');

@@ -22,7 +22,13 @@ import {
 } from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
-import {CreateEmergencyPhone} from '../actions/emergency.actions';
+import axios from '../helpers/axios';
+import {
+  CreateEmergencyPhone,
+  getPhones,
+  DeletePhone,
+} from '../actions/emergency.actions';
+
 import {useForm, Controller} from 'react-hook-form';
 // import SendSMS from 'react-native-sms';
 
@@ -47,6 +53,7 @@ const HEIGHT = Dimensions.get('window').height;
 
 const EmergencyContactScreen = ({navigation}) => {
   // const userauth = useSelector(state => state.userAuth);
+  const Phones = useSelector(state => state.emergencyPhone);
   const dispatch = useDispatch();
   const isDarkMode = useColorScheme() === 'dark';
   const [loggedIn, setLoggedIn] = useState({});
@@ -54,9 +61,12 @@ const EmergencyContactScreen = ({navigation}) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [EmergencyPhone, setEmergencyPhone] = useState([]);
   const [EmergencyData, setEmergencyData] = useState([]);
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? '#ffff' : '#ffff',
-  };
+  const [PhoneData, setPhoeData] = useState({posts: []});
+  const [status, setStatus] = useState(null);
+  const [currentId, setCurrentId] = useState(null);
+  // const backgroundStyle = {
+  //   backgroundColor: isDarkMode ? '#ffff' : '#ffff',
+  // };
   const {
     handleSubmit,
     control,
@@ -71,6 +81,13 @@ const EmergencyContactScreen = ({navigation}) => {
   useEffect(() => {
     userFormLogin();
   }, []);
+
+  useEffect(() => {
+    dispatch(getPhones());
+    setPhoeData(Phones.posts);
+  }, [currentId]);
+
+  // console.log('phone =========', PhoneData?.posts);
 
   // const HandleVoiceResult = e => {
   //   setVoice(e);
@@ -148,14 +165,25 @@ const EmergencyContactScreen = ({navigation}) => {
     AsyncStorage.setItem('emergencyFulleData', JSON.stringify(EmergencyData));
     // EmergencyPhoneChanges.push(data.Phone);
     userEmergencyPhone();
+
     dispatch(
       CreateEmergencyPhone({
         ...data,
         UserID: loggedIn.user._id,
       }),
     );
+    setModalVisible(false);
     console.log({data});
   };
+
+  useEffect(() => {
+    if (Phones?.posts?.posts) {
+      AsyncStorage.setItem(
+        'emergencyFulleData',
+        JSON.stringify(PhoneData?.posts),
+      );
+    }
+  }, [currentId, PhoneData?.posts]);
 
   const validate = (value: string) => {
     const matches = value.match(
@@ -169,6 +197,30 @@ const EmergencyContactScreen = ({navigation}) => {
   }, [mobileNumber]);
   console.log('emergency=====', EmergencyData);
 
+  const DeleteData = id => {
+    console.log('gfdg', id);
+    setCurrentId(id);
+    dispatch(DeletePhone(id));
+    PhoneData?.posts.filter(post => post._id !== id);
+    userEmergencyPhone();
+  };
+
+  // const DeleteData = async id => {
+  //   try {
+  //     console.log({id});
+  //     const {data} = await axios.delete(`/${id}`);
+  //     console.log(data);
+  //     setStatus(data);
+  //     setCurrentId(id);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
+  // console.log(
+  //   'updatedsddd',
+  //   PhoneData.posts.filter(post => post._id !== currentId),
+  // );
+  let EmergencyDatas = EmergencyData.filter(post => post._id !== currentId);
   return (
     <View
       style={{
@@ -525,7 +577,7 @@ const EmergencyContactScreen = ({navigation}) => {
                   maxHeight: HEIGHT - 700,
                 }}>
                 <ScrollView>
-                  {EmergencyData.length > 0 ? (
+                  {EmergencyDatas.length > 0 ? (
                     <View
                       style={{
                         flexDirection: 'row',
@@ -574,8 +626,8 @@ const EmergencyContactScreen = ({navigation}) => {
                     <Text>You have not created any report yet</Text>
                   )}
 
-                  {EmergencyData.length > 0 &&
-                    EmergencyData.map((item, i) => (
+                  {EmergencyDatas.length > 0 &&
+                    EmergencyDatas.map((item, i) => (
                       <View
                         key={i}
                         style={{
@@ -596,19 +648,21 @@ const EmergencyContactScreen = ({navigation}) => {
                         <Text style={{width: '35%', color: '#000000'}}>
                           {item.Email}
                         </Text>
-                        <Text style={{width: '5%', color: '#000000'}}>
-                          <Image
-                            source={Delete}
-                            resizeMode="contain"
-                            style={{
-                              width: 12,
-                              height: 12,
-                              // aspectRatio: 1,
-                              marginTop: 0,
-                              marginRight: 3,
-                            }}
-                          />
-                        </Text>
+                        <View style={{width: '5%', color: '#000000'}}>
+                          <Pressable onPress={() => DeleteData(item._id)}>
+                            <Image
+                              source={Delete}
+                              resizeMode="contain"
+                              style={{
+                                width: 12,
+                                height: 12,
+                                // aspectRatio: 1,
+                                marginTop: 0,
+                                marginRight: 3,
+                              }}
+                            />
+                          </Pressable>
+                        </View>
                       </View>
                     ))}
                   {/* <TextInput

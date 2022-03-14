@@ -22,7 +22,7 @@ import {
 } from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
-import {userSignup, Userlogin} from '../actions';
+import {userSignup, Userlogin, UserloginRequesr} from '../actions';
 import {useForm, Controller} from 'react-hook-form';
 
 import image1 from '../image/loginBg.png';
@@ -125,11 +125,21 @@ const Index = ({navigation, setLoggedIns}) => {
     if (auth.authenticate) {
       AsyncStorage.setItem('isLoggedIn', '1');
       AsyncStorage.setItem('UserData', JSON.stringify(auth));
+      let phone = {phone: auth.user.Phone};
+      dispatch(UserloginRequesr(phone));
+      console.log('============d', phone);
+      // dispatch(UserloginRequesr(auth.user.Phone));
       // navigation.navigate('Location', {name: 'Location'});
     } else {
       navigation.navigate('SignUp', {name: 'SignUp'});
     }
   }, [auth.authenticate]);
+
+  // const VerifyRequest = () => {
+  //   if (auth.authenticate) {
+  //     dispatch(UserloginRequesr(auth.user.Phone));
+  //   }
+  // };
 
   let condition;
   if (user.message) {
@@ -271,13 +281,7 @@ const Index = ({navigation, setLoggedIns}) => {
 
               <Text>{Loginerror}</Text>
 
-              <Text
-                style={styles.submitButton}
-                onPress={() =>
-                  navigation.navigate('Location', {name: 'Location'})
-                }>
-                Submit
-              </Text>
+              <Text style={styles.submitButton}>Submit</Text>
             </SafeAreaView>
             <Text style={styles.alreadyMember}>Any Probem?</Text>
             <Text

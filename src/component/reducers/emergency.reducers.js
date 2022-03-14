@@ -62,6 +62,7 @@ export default (state = {isLoading: true}, action) => {
       return {
         ...state,
         posts: state.posts.filter(post => post._id !== action.payload),
+        postDeleteStatus: true,
       };
     default:
       return state;

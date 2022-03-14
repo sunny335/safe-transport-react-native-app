@@ -22,7 +22,12 @@ import {
 } from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
-import {userSignup, Userlogin} from '../actions';
+import {
+  userSignup,
+  Userlogin,
+  UserloginRequesr,
+  userVerifyAndSign,
+} from '../actions';
 import {useForm, Controller} from 'react-hook-form';
 import {createPost} from '../actions/otp.actions';
 
@@ -46,6 +51,7 @@ const Index = ({navigation, setLoggedIns}) => {
   const user = useSelector(state => state.userRegistration);
 
   const [loading, setloading] = useState(false);
+  const [loggedIn, setLoggedIn] = useState({});
   const [LoginLoader, setLoginLoader] = useState(false);
   const [Loginerror, setLoginError] = useState('');
   const [OTP, setOTP] = useState('');
@@ -64,22 +70,43 @@ const Index = ({navigation, setLoggedIns}) => {
     setLoginLoader(auth.authenticating);
   }, [auth.authenticating]);
 
+  const userFormLogin = async () => {
+    const loggedIna = await AsyncStorage.getItem('UserData');
+    setLoggedIn(JSON.parse(loggedIna));
+  };
+
+  useEffect(() => {
+    userFormLogin();
+  }, []);
+
   const HandleOtp = () => {
     if (OTP == '66') {
-      // navigation.navigate('HomeScreen', {name: 'HomeScreen'});
-      setLoginError('');
-      console.log('clicked');
-      // const otp = {OtpValid: true};
-      // dispatch(createPost(otp));
-      AsyncStorage.setItem('OTP', 'valid');
-      // console.log('otpData', otpData.OtpValid);
-      // setTimeout(() => {
-      // }, 2000);
+      // setLoginError('');
+      // console.log('clicked');
+      // AsyncStorage.setItem('OTP', 'valid');
+      let phone = {phone: loggedIn.user.Phone};
+      dispatch(UserloginRequesr(phone));
+      console.log(phone);
     } else {
       setLoginError('Please enter Valid OTP');
     }
   };
 
+  const HandleOtpVerify = () => {
+    // setLoginError('');
+    // console.log('clicked');
+    // AsyncStorage.setItem('OTP', 'valid');
+    let phone = {
+      phone: loggedIn.user.Phone,
+      otp: OTP,
+      hash: otpData?.hashData,
+    };
+    dispatch(userVerifyAndSign(phone));
+    console.log(phone);
+  };
+
+  console.log('gtfsdrdfg', loggedIn?.user?.Phone);
+  console.log('otpDATA', otpData);
   return (
     <>
       <StatusBar barStyle={isDarkMode ? '#fff' : 'dark-content'} />
@@ -164,7 +191,9 @@ const Index = ({navigation, setLoggedIns}) => {
               Submit
             </Text>
           </SafeAreaView>
-          <Text style={styles.alreadyMember}>Any Probem?</Text>
+          <Text style={styles.alreadyMember} onPress={() => HandleOtpVerify()}>
+            Any Probem?
+          </Text>
           <Text
             style={{
               marginTop: 5,
