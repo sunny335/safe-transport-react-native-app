@@ -22,7 +22,12 @@ import {
 } from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
-import {userSignup, Userlogin, UserloginRequesr} from '../actions';
+import {
+  userSignup,
+  Userlogin,
+  UserloginRequesr,
+  userVerifyAndSign,
+} from '../actions';
 import {useForm, Controller} from 'react-hook-form';
 
 import image1 from '../image/loginBg.png';
@@ -84,6 +89,7 @@ const Index = ({navigation, setLoggedIns}) => {
   const userSignupform = data => {
     // setSignUpProgress(true);
     data.signupAs = checked;
+    data.valid = 'false';
     dispatch(userSignup(data));
   };
 
@@ -95,6 +101,7 @@ const Index = ({navigation, setLoggedIns}) => {
     console.log('auth', datas);
     dispatch(Userlogin(datas));
   };
+
   useEffect(() => {
     if (user.loading) {
       if (user.message == 'User created Successfully...!') {
@@ -118,6 +125,13 @@ const Index = ({navigation, setLoggedIns}) => {
   }, [user.loading]);
 
   useEffect(() => {
+    clearAsyncStorage = async () => {
+      AsyncStorage.clear();
+    };
+    clearAsyncStorage();
+  }, []);
+
+  useEffect(() => {
     setLoginLoader(auth.authenticating);
   }, [auth.authenticating]);
 
@@ -126,7 +140,11 @@ const Index = ({navigation, setLoggedIns}) => {
       AsyncStorage.setItem('isLoggedIn', '1');
       AsyncStorage.setItem('UserData', JSON.stringify(auth));
       let phone = {phone: auth.user.Phone};
-      dispatch(UserloginRequesr(phone));
+      if (auth.user.valid == 'false') {
+        dispatch(userVerifyAndSign(phone));
+        dispatch(UserloginRequesr(phone));
+      }
+
       console.log('============d', phone);
       // dispatch(UserloginRequesr(auth.user.Phone));
       // navigation.navigate('Location', {name: 'Location'});
@@ -148,6 +166,7 @@ const Index = ({navigation, setLoggedIns}) => {
   if (user.loading) {
     condition = <Text>{user.message}Password minimum length 6 character</Text>;
   }
+
   useEffect(() => {
     if (auth.error) {
       setLoginError('Please enter valid information');

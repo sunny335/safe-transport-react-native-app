@@ -54,6 +54,7 @@ const Index = ({navigation, setLoggedIns}) => {
   const [loggedIn, setLoggedIn] = useState({});
   const [LoginLoader, setLoginLoader] = useState(false);
   const [Loginerror, setLoginError] = useState('');
+  const [hashData, sethashData] = useState(null);
   const [OTP, setOTP] = useState('');
 
   const dispatch = useDispatch();
@@ -73,6 +74,8 @@ const Index = ({navigation, setLoggedIns}) => {
   const userFormLogin = async () => {
     const loggedIna = await AsyncStorage.getItem('UserData');
     setLoggedIn(JSON.parse(loggedIna));
+    const ab = await AsyncStorage.getItem('otpverify');
+    sethashData(JSON.parse(ab));
   };
 
   useEffect(() => {
@@ -80,33 +83,52 @@ const Index = ({navigation, setLoggedIns}) => {
   }, []);
 
   const HandleOtp = () => {
-    if (OTP == '66') {
-      // setLoginError('');
-      // console.log('clicked');
-      // AsyncStorage.setItem('OTP', 'valid');
-      let phone = {phone: loggedIn.user.Phone};
-      dispatch(UserloginRequesr(phone));
+    let phone = {phone: loggedIn.user.Phone};
+    dispatch(UserloginRequesr(phone));
+    setLoginError('');
+    console.log(phone);
+  };
+
+  const HandleOtpVerify = () => {
+    if (OTP.length === 6) {
+      setLoginError('');
+
+      let phone = {
+        phone: loggedIn.user.Phone,
+        otp: OTP,
+        hash: hashData,
+        id: loggedIn.user._id,
+      };
+      dispatch(userVerifyAndSign(phone));
       console.log(phone);
+      if (otpData?.verifyStatus == 'Otp is expired') {
+        setLoginError('your otp is expired');
+      }
+      if (otpData?.verifyStatus?.status == 'success') {
+        setLoginError('otp Verify successfull');
+      }
     } else {
       setLoginError('Please enter Valid OTP');
     }
   };
 
-  const HandleOtpVerify = () => {
-    // setLoginError('');
-    // console.log('clicked');
-    // AsyncStorage.setItem('OTP', 'valid');
-    let phone = {
-      phone: loggedIn.user.Phone,
-      otp: OTP,
-      hash: otpData?.hashData,
-    };
-    dispatch(userVerifyAndSign(phone));
-    console.log(phone);
-  };
+  useEffect(() => {
+    if (!otpData.verifying) {
+      if (otpData?.verifyStatus?.status == 'success') {
+        AsyncStorage.setItem('OTP', 'valid');
+        setLoginError('otp Verify successfull');
+      }
+    }
+  }, [otpData.verifying]);
 
-  console.log('gtfsdrdfg', loggedIn?.user?.Phone);
-  console.log('otpDATA', otpData);
+  useEffect(() => {
+    if (otpData?.hashData !== undefined) {
+      sethashData(otpData?.hashData);
+    }
+  }, [otpData?.hashData]);
+
+  // console.log('gtfsdrdfg', loggedIn?.user?.Phone);
+  console.log('otpDATA');
   return (
     <>
       <StatusBar barStyle={isDarkMode ? '#fff' : 'dark-content'} />
@@ -187,13 +209,11 @@ const Index = ({navigation, setLoggedIns}) => {
 
             <Text style={{color: 'red', marginBottom: 10}}>{Loginerror}</Text>
 
-            <Text style={styles.submitButton} onPress={HandleOtp}>
+            <Text style={styles.submitButton} onPress={() => HandleOtpVerify()}>
               Submit
             </Text>
           </SafeAreaView>
-          <Text style={styles.alreadyMember} onPress={() => HandleOtpVerify()}>
-            Any Probem?
-          </Text>
+          <Text style={styles.alreadyMember}>Any Probem?</Text>
           <Text
             style={{
               marginTop: 5,
@@ -204,7 +224,7 @@ const Index = ({navigation, setLoggedIns}) => {
             }}>
             if you havn’t OTP code in phone.{' '}
             <Text
-              onPress={() => setLogin(false)}
+              onPress={() => HandleOtp()}
               style={{
                 marginTop: 5,
                 fontWeight: '700',

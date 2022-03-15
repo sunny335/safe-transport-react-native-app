@@ -83,8 +83,10 @@ export const UserFormsignout = () => {
   return async dispatch => {
     dispatch({type: userAuthConstants.LOGOUT_REQUEST});
     const res = await axios.post('/signout');
+
     if (res.status === 200) {
       AsyncStorage.clear();
+      AsyncStorage.setItem('OTP', 'invalid');
       dispatch({
         type: userAuthConstants.LOGOUT_SUCCESS,
       });

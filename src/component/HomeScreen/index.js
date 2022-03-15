@@ -67,6 +67,8 @@ const HomeScreen = ({navigation}) => {
 
   const logOut = () => {
     dispatch(UserFormsignout());
+    AsyncStorage.removeItem('OTP');
+    AsyncStorage.removeItem('otpverify');
   };
   useEffect(() => {
     if (userauth.loading) {

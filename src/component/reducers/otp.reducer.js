@@ -10,9 +10,9 @@ export default (state = initState, action) => {
     case userAuthVerifyConstants.OTP_REQUEST:
       state = {
         ...state,
-        verifying: true,
-        verifyed: false,
+
         loading: false,
+        OTP_REQUEST: true,
       };
       break;
     case userAuthVerifyConstants.OTP_SUCCESS:
@@ -20,9 +20,8 @@ export default (state = initState, action) => {
         ...state,
         hashData: action.payload.user,
 
-        verifying: false,
-        verifyed: true,
         loading: false,
+        OTP_REQUEST: false,
       };
       break;
     case userAuthVerifyConstants.OTP_FAILURE:
@@ -30,10 +29,9 @@ export default (state = initState, action) => {
         ...state,
         hashData: action.payload.user,
 
-        verifying: false,
-        verifyed: false,
         loading: false,
         error: action.payload.error,
+        OTP_REQUEST: false,
       };
       break;
     case userAuthVerifyConstants.OTP_VERIFY_REQUEST:
@@ -56,8 +54,8 @@ export default (state = initState, action) => {
     case userAuthVerifyConstants.OTP_VERIFY_FAILER:
       state = {
         ...state,
-        hashData: action.payload.user,
-        verifying: false,
+
+        verifying: true,
         verifyed: false,
         loading: false,
         error: action.payload.error,

@@ -39,6 +39,7 @@ import OtpScreen from './src/component/OtpScreen';
 const App: () => Node = () => {
   const isDarkMode = useColorScheme() === 'dark';
   const auth = useSelector(state => state.userAuth);
+  const otpData = useSelector(state => state.otp);
   const [loggedIn, setLoggedIn] = useState(false);
   const [OTP, setOtp] = useState(false);
   const [animating, setAnimating] = useState(true);
@@ -47,6 +48,7 @@ const App: () => Node = () => {
     backgroundColor: isDarkMode ? '#ffff' : '#ffff',
     height: '100%',
   };
+
   React.useEffect(() => {
     StatusBar.setBackgroundColor('#FF573300');
     StatusBar.setTranslucent(true);
@@ -58,6 +60,9 @@ const App: () => Node = () => {
     const loggedIn = await AsyncStorage.getItem('isLoggedIn');
     if (loggedIn == '1') {
       setLoggedIn(true);
+      if (auth.user.valid == 'true') {
+        setOtp(true);
+      }
     } else {
       setLoggedIn(false);
     }
@@ -68,13 +73,17 @@ const App: () => Node = () => {
     console.log('opttttttpppppppppp', otp);
     if (otp == 'valid') {
       setOtp(true);
+    }
+    if (auth.user.valid == 'true') {
+      setOtp(true);
     } else {
       setOtp(false);
     }
   };
-  // const chckLocationPermission = PermissionsAndroid.check(
-  //   PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-  // );
+
+  const chckLocationPermission = PermissionsAndroid.check(
+    PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+  );
   // console.log('loaction permission', chckLocationPermission);
   const HandleLocation = async () => {
     const result = await PermissionsAndroid.check(
@@ -111,10 +120,22 @@ const App: () => Node = () => {
       setAnimating(false);
     }, 1000);
   }, []);
+
+  useEffect(() => {
+    if (!otpData.verifying) {
+      if (otpData?.verifyStatus?.status == 'success') {
+        setOtp(true);
+      }
+    }
+    if (otpData?.OTP_REQUEST) {
+      setOtp(false);
+    }
+  }, [otpData.verifying, otpData?.OTP_REQUEST]);
+
   if (animating) {
     return <SplashScreen />;
   }
-  // console.log('{OTP', loggedIn);
+  console.log('{OTP', otpData?.verifyStatus?.status);
 
   // useEffect(() => {
 
