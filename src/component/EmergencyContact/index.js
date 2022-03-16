@@ -121,47 +121,6 @@ const EmergencyContactScreen = ({navigation}) => {
     setPhoeData(Phones.posts);
   }, [currentId, refresh]);
 
-  // console.log('phone =========', PhoneData?.posts);
-
-  // const HandleVoiceResult = e => {
-  //   setVoice(e);
-  //   console.log('result', e);
-  // };
-  // const HandleVoiceStart = e => {
-  //   setVoice('starting');
-  //   console.log('starting', e);
-  // };
-  // const HandleVoiceEnd = e => {
-  //   setVoice(e);
-  //   console.log('ending', e);
-  // };
-  // useEffect(() => {
-  //   Voice.onSpeechStart = e => {
-  //     setVoice('starting');
-  //     console.log('starting', e);
-  //   };
-  //   Voice.onSpeechEnd = e => {
-  //     setVoice(e);
-  //     console.log('ending', e);
-  //   };
-  //   Voice.onSpeechResults = e => {
-  //     setVoice(e);
-  //     console.log('result', e);
-  //   };
-  //   return () => {
-  //     Voice.destroy().then(Voice.removeAllListeners);
-  //   };
-  // }, []);
-
-  // const startRecording = () => {
-  //   try {
-  //     Voice.start('en-US');
-  //     console.log('clicked record', Voice.onSpeechStart);
-  //   } catch (error) {
-  //     console.log('error rised', error);
-  //   }
-  // };
-
   const [mobileNumber, setMobileNumber] = useState([]);
   // const [Message, setMessage] = useState('I am On danger');
   let Message = `Your relative ${
@@ -171,11 +130,6 @@ const EmergencyContactScreen = ({navigation}) => {
     loggedIn?.user?.Phone
   }`;
 
-  let updatedMobilePhone =
-    mobileNumber.length == 0
-      ? EmergencyPhone.filter((item, pos) => mobileNumber.indexOf(item) == pos)
-      : mobileNumber.filter((item, pos) => mobileNumber.indexOf(item) == pos);
-  console.log('mobileNumber', updatedMobilePhone);
   const sendingSms = (Receivers, Messagex) => {
     try {
       Receivers.map(
@@ -200,6 +154,7 @@ const EmergencyContactScreen = ({navigation}) => {
     const loggedIna = await AsyncStorage.getItem('emergencyStorageData');
     setEmergencyPhone(JSON.parse(loggedIna));
     const emergencyData = await AsyncStorage.getItem('emergencyFulleData');
+
     setEmergencyData(JSON.parse(emergencyData));
   };
 
@@ -252,12 +207,17 @@ const EmergencyContactScreen = ({navigation}) => {
     setCurrentId(id);
     dispatch(DeletePhone(id));
     PhoneData?.posts.filter(post => post._id !== id);
-    mobileNumber.filter(value => value != phne);
-    EmergencyPhone.filter(value => value != phne);
-    console.log('rdgfd', EmergencyPhone);
+    EmergencyPhone?.filter(value => value != phne);
+    updatedMobilePhone?.filter(value => value != phne);
+
     userEmergencyPhone();
   };
 
+  let updatedMobilePhone =
+    mobileNumber.length == 0
+      ? EmergencyPhone?.filter((item, pos) => mobileNumber.indexOf(item) == pos)
+      : mobileNumber.filter((item, pos) => mobileNumber.indexOf(item) == pos);
+  console.log('mobileNumber', updatedMobilePhone);
   // const DeleteData = async id => {
   //   try {
   //     console.log({id});
@@ -273,7 +233,9 @@ const EmergencyContactScreen = ({navigation}) => {
   //   'updatedsddd',
   //   PhoneData.posts.filter(post => post._id !== currentId),
   // );
-  let EmergencyDatas = EmergencyData?.filter(post => post._id !== currentId);
+
+  let c = EmergencyData?.filter(post => post.UserID === loggedIn?.user?._id);
+  let EmergencyDatas = c?.filter(post => post._id !== currentId);
   return (
     <View
       style={{
@@ -714,6 +676,8 @@ const EmergencyContactScreen = ({navigation}) => {
                         </Text>
                         <Text style={{width: '35%', color: '#000000'}}>
                           {item.Phone}
+                        </Text>
+                        <Text style={{display: 'none'}}>
                           {mobileNumber.push(item.Phone)}
                         </Text>
 

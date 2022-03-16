@@ -63,12 +63,6 @@ const App: () => Node = () => {
     if (loggedIna == '1') {
       setLoggedIn(true);
       setloggedinUser(JSON.parse(loggedUserData));
-      if (auth.user.valid == 'true') {
-        setOtp(true);
-      }
-      if (loggedinUser.user.valid == 'true') {
-        setOtp(true);
-      }
     } else {
       setLoggedIn(false);
     }
@@ -79,18 +73,29 @@ const App: () => Node = () => {
     const loggedUserData = await AsyncStorage.getItem('UserData');
     console.log('opttttttpppppppppp', otp);
     if (otp == 'valid') {
+      console.log('otp == valid', otp);
       setloggedinUser(JSON.parse(loggedUserData));
       setOtp(true);
     }
-    if (auth.user.valid == 'true') {
-      setOtp(true);
-    }
-    if (loggedinUser.user.valid == 'true') {
+    if (otpData.verifyStatus.status == 'success') {
       setOtp(true);
     } else {
       setOtp(false);
     }
   };
+
+  useEffect(() => {
+    isOTPValid();
+  }, [otpData.verifyed]);
+
+  useEffect(() => {
+    console.log('{OTP', auth.user.valid);
+    if (auth.user.valid == 'true') {
+      setOtp(true);
+    } else {
+      setOtp(false);
+    }
+  }, [auth.authenticate]);
 
   const chckLocationPermission = PermissionsAndroid.check(
     PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
@@ -103,7 +108,7 @@ const App: () => Node = () => {
     // const chckLocationPermission = PermissionsAndroid.check(
     //   PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
     // );
-    console.log('loaction permission===========', result);
+    // console.log('loaction permission===========', result);
     if (result === true) {
       setLocation(false);
       // console.log('You can use the location');
@@ -116,11 +121,7 @@ const App: () => Node = () => {
   useEffect(() => {
     isLogged();
     HandleLocation();
-  }, []);
-
-  useEffect(() => {
-    isOTPValid();
-  }, []);
+  }, [auth.loading]);
 
   useEffect(() => {
     isLogged(auth.authenticate);
@@ -132,25 +133,11 @@ const App: () => Node = () => {
     }, 1000);
   }, []);
 
-  useEffect(() => {
-    if (!otpData.verifying) {
-      if (otpData?.verifyStatus?.status == 'success') {
-        setOtp(true);
-      }
-    }
-    if (otpData?.OTP_REQUEST) {
-      setOtp(false);
-    }
-  }, [otpData.verifying, otpData?.OTP_REQUEST]);
-
   if (animating) {
     return <SplashScreen />;
   }
-  // console.log('{OTP', loggedinUser);
 
-  // useEffect(() => {
-
-  // }, []);
+  console.log(otpData.verifyed);
 
   return (
     <NavigationContainer>

@@ -98,6 +98,12 @@ const HomeScreen = ({navigation}) => {
     dispatch(UserFormsignout());
     AsyncStorage.removeItem('OTP');
     AsyncStorage.removeItem('otpverify');
+    AsyncStorage.removeItem('emergencyStorageData');
+    AsyncStorage.removeItem('emergencyFulleData');
+    clearAsyncStorage = async () => {
+      AsyncStorage.clear();
+    };
+    clearAsyncStorage();
   };
   useEffect(() => {
     if (userauth.loading) {
