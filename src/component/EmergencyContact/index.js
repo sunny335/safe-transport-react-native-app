@@ -30,6 +30,9 @@ import {
 } from '../actions/emergency.actions';
 
 import {useForm, Controller} from 'react-hook-form';
+import Geocoder from 'react-native-geocoding';
+import GetLocation from 'react-native-get-location';
+
 // import SendSMS from 'react-native-sms';
 
 import SmsAndroid from 'react-native-get-sms-android';
@@ -40,6 +43,7 @@ import avatar from '../image/avatar.png';
 import Vector2 from '../image/Vector2.png';
 import Emergency from '../image/emergency.png';
 import Delete from '../image/delete.png';
+import PlaceMarker from '../image/PlaceMarker.png';
 import DoubleRight from '../image/DoubleRight.png';
 
 import HomeImg from '../image/homedefault.png';
@@ -62,11 +66,41 @@ const EmergencyContactScreen = ({navigation}) => {
   const [EmergencyPhone, setEmergencyPhone] = useState([]);
   const [EmergencyData, setEmergencyData] = useState([]);
   const [PhoneData, setPhoeData] = useState({posts: []});
-  const [status, setStatus] = useState(null);
+  const [LocationLong, setLocationLong] = useState(null);
+  const [currentLocation, setcurrentLocation] = useState(null);
   const [currentId, setCurrentId] = useState(null);
+  const [refresh, setrefresh] = useState(false);
+
+  Geocoder.init('AIzaSyAQdhc-Oy-IITFz_AgsWXv1WrT4c0cdzek');
+  const handleLocation = () => {
+    GetLocation.getCurrentPosition({
+      enableHighAccuracy: false,
+      timeout: 30000,
+    })
+      .then(location => {
+        Geocoder.from(location?.latitude, location?.longitude)
+          .then(json => {
+            var addressComponent = json.results[0].formatted_address;
+            // console.log('dfgfd', addressComponent);
+            setLocationLong(location);
+            setcurrentLocation(addressComponent);
+          })
+          .catch(error => console.warn(error));
+      })
+      .catch(error => {
+        const {code, message} = error;
+        console.warn(code, message);
+      });
+  };
+
+  useEffect(() => {
+    handleLocation();
+  }, [refresh]);
+
   // const backgroundStyle = {
   //   backgroundColor: isDarkMode ? '#ffff' : '#ffff',
   // };
+  // console.log('rfgfd', LocationLong);
   const {
     handleSubmit,
     control,
@@ -80,12 +114,12 @@ const EmergencyContactScreen = ({navigation}) => {
 
   useEffect(() => {
     userFormLogin();
-  }, []);
+  }, [refresh]);
 
   useEffect(() => {
     dispatch(getPhones());
     setPhoeData(Phones.posts);
-  }, [currentId]);
+  }, [currentId, refresh]);
 
   // console.log('phone =========', PhoneData?.posts);
 
@@ -128,9 +162,20 @@ const EmergencyContactScreen = ({navigation}) => {
   //   }
   // };
 
-  const [mobileNumber, setMobileNumber] = useState(['01967487507']);
-  const [Message, setMessage] = useState('I am On danger');
+  const [mobileNumber, setMobileNumber] = useState([]);
+  // const [Message, setMessage] = useState('I am On danger');
+  let Message = `Your relative ${
+    loggedIn?.user?.firstName &&
+    loggedIn?.user?.firstName + ' ' + loggedIn?.user.lastName
+  } facing some problem,location:${currentLocation}. Phone:${
+    loggedIn?.user?.Phone
+  }`;
 
+  let updatedMobilePhone =
+    mobileNumber.length == 0
+      ? EmergencyPhone.filter((item, pos) => mobileNumber.indexOf(item) == pos)
+      : mobileNumber.filter((item, pos) => mobileNumber.indexOf(item) == pos);
+  console.log('mobileNumber', updatedMobilePhone);
   const sendingSms = (Receivers, Messagex) => {
     try {
       Receivers.map(
@@ -183,7 +228,7 @@ const EmergencyContactScreen = ({navigation}) => {
         JSON.stringify(PhoneData?.posts),
       );
     }
-  }, [currentId, PhoneData?.posts]);
+  }, [currentId, PhoneData?.posts, refresh]);
 
   const validate = (value: string) => {
     const matches = value.match(
@@ -194,14 +239,22 @@ const EmergencyContactScreen = ({navigation}) => {
 
   useEffect(() => {
     userEmergencyPhone();
-  }, [mobileNumber]);
-  console.log('emergency=====', EmergencyData);
+  }, [mobileNumber, refresh]);
 
-  const DeleteData = id => {
+  useEffect(() => {
+    userEmergencyPhone();
+  }, [refresh]);
+
+  // console.log('emergency=====', EmergencyData);
+
+  const DeleteData = (id, phne) => {
     console.log('gfdg', id);
     setCurrentId(id);
     dispatch(DeletePhone(id));
     PhoneData?.posts.filter(post => post._id !== id);
+    mobileNumber.filter(value => value != phne);
+    EmergencyPhone.filter(value => value != phne);
+    console.log('rdgfd', EmergencyPhone);
     userEmergencyPhone();
   };
 
@@ -220,7 +273,7 @@ const EmergencyContactScreen = ({navigation}) => {
   //   'updatedsddd',
   //   PhoneData.posts.filter(post => post._id !== currentId),
   // );
-  let EmergencyDatas = EmergencyData.filter(post => post._id !== currentId);
+  let EmergencyDatas = EmergencyData?.filter(post => post._id !== currentId);
   return (
     <View
       style={{
@@ -459,6 +512,22 @@ const EmergencyContactScreen = ({navigation}) => {
                   {loggedIn?.user?.firstName &&
                     loggedIn?.user?.firstName + ' ' + loggedIn?.user.lastName}
                 </Text>
+                <View style={{flexDirection: 'row'}}>
+                  <Image
+                    source={PlaceMarker}
+                    resizeMode="contain"
+                    style={{
+                      width: 20,
+                      height: 20,
+                      aspectRatio: 1,
+                      marginTop: 0,
+                      marginRight: 5,
+                    }}
+                  />
+                  <Text style={{color: '#fff'}}>
+                    {currentLocation && currentLocation}
+                  </Text>
+                </View>
               </View>
             </View>
           </View>
@@ -471,7 +540,8 @@ const EmergencyContactScreen = ({navigation}) => {
                 fontWeight: '600',
                 fontSize: 36,
                 color: '#fff',
-              }}>
+              }}
+              onPress={() => setrefresh(!refresh)}>
               SAFE
             </Text>
           </View>
@@ -539,7 +609,8 @@ const EmergencyContactScreen = ({navigation}) => {
                     color: '#0F254F',
                     fontSize: 16,
                     fontWeight: '700',
-                  }}>
+                  }}
+                  onPress={() => getLocationHandle()}>
                   My Contact
                 </Text>
                 <Pressable
@@ -577,7 +648,7 @@ const EmergencyContactScreen = ({navigation}) => {
                   maxHeight: HEIGHT - 700,
                 }}>
                 <ScrollView>
-                  {EmergencyDatas.length > 0 ? (
+                  {EmergencyDatas?.length > 0 ? (
                     <View
                       style={{
                         flexDirection: 'row',
@@ -626,7 +697,7 @@ const EmergencyContactScreen = ({navigation}) => {
                     <Text>You have not created any report yet</Text>
                   )}
 
-                  {EmergencyDatas.length > 0 &&
+                  {EmergencyDatas?.length > 0 &&
                     EmergencyDatas.map((item, i) => (
                       <View
                         key={i}
@@ -643,13 +714,15 @@ const EmergencyContactScreen = ({navigation}) => {
                         </Text>
                         <Text style={{width: '35%', color: '#000000'}}>
                           {item.Phone}
+                          {mobileNumber.push(item.Phone)}
                         </Text>
 
                         <Text style={{width: '35%', color: '#000000'}}>
                           {item.Email}
                         </Text>
                         <View style={{width: '5%', color: '#000000'}}>
-                          <Pressable onPress={() => DeleteData(item._id)}>
+                          <Pressable
+                            onPress={() => DeleteData(item._id, item.Phone)}>
                             <Image
                               source={Delete}
                               resizeMode="contain"
@@ -699,7 +772,7 @@ const EmergencyContactScreen = ({navigation}) => {
               justifyContent: 'center',
               marginTop: 20,
             }}
-            onPress={() => sendingSms(mobileNumber, Message)}>
+            onPress={() => sendingSms(updatedMobilePhone, Message)}>
             <View
               style={{
                 backgroundColor: '#D2007E',

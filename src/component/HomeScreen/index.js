@@ -20,7 +20,6 @@ import {
 } from 'react-native';
 import {t} from 'react-native-tailwindcss';
 import {useDispatch, useSelector} from 'react-redux';
-import Geocoder from 'react-native-geocoding';
 
 import image1 from '../image/loginBg.png';
 // import profile from '../image/profile.jpg';
@@ -36,7 +35,10 @@ import ProfileImg from '../image/profileicon.png';
 import QrCode from '../image/QrCode.png';
 import generateQr from '../image/generateQr.png';
 import generatedQr from '../image/generated.png';
+import PlaceMarker from '../image/PlaceMarker.png';
 import SplashScreen from '../SplashScreen/SplashScreen';
+import Geocoder from 'react-native-geocoding';
+import GetLocation from 'react-native-get-location';
 
 import {UserFormsignout} from '../actions/userAuth.action';
 
@@ -51,6 +53,8 @@ const HomeScreen = ({navigation}) => {
   const [loggedIn, setLoggedIn] = useState({});
   const [animating, setAnimating] = useState(false);
   const [publicuser, setpublicuser] = useState(false);
+  const [LocationLong, setLocationLong] = useState(null);
+  const [currentLocation, setcurrentLocation] = useState(null);
   const backgroundStyle = {
     backgroundColor: isDarkMode ? '#ffff' : '#ffff',
     height: HEIGHT,
@@ -61,8 +65,33 @@ const HomeScreen = ({navigation}) => {
     setLoggedIn(JSON.parse(loggedIna));
   };
 
+  // get location
+  Geocoder.init('AIzaSyAQdhc-Oy-IITFz_AgsWXv1WrT4c0cdzek');
+
+  const handleLocation = () => {
+    GetLocation.getCurrentPosition({
+      enableHighAccuracy: false,
+      timeout: 30000,
+    })
+      .then(location => {
+        Geocoder.from(location?.latitude, location?.longitude)
+          .then(json => {
+            var addressComponent = json.results[0].formatted_address;
+            // console.log('dfgfd', addressComponent);
+            setLocationLong(location);
+            setcurrentLocation(addressComponent);
+          })
+          .catch(error => console.warn(error));
+      })
+      .catch(error => {
+        const {code, message} = error;
+        console.warn(code, message);
+      });
+  };
+
   useEffect(() => {
     userFormLogin();
+    handleLocation();
   }, []);
 
   const logOut = () => {
@@ -94,15 +123,18 @@ const HomeScreen = ({navigation}) => {
     },
   );
 
-  const getlocation = () => {
-    Geocoder.from(23.8103, 90.4125)
-      .then(json => {
-        var addressComponent = json.results[0].address_components[0];
-        console.log(addressComponent);
-      })
-      .catch(error => console.warn(error));
-  };
+  // const getlocation = () => {
+  //   Geocoder.from(23.8103, 90.4125)
+  //     .then(json => {
+  //       var addressComponent = json.results[0].address_components[0];
+  //       console.log(addressComponent);
+  //     })
+  //     .catch(error => console.warn(error));
+  // };
+  // var utcSeconds = LocationLong.time;
+  // var d = new Date(utcSeconds);
 
+  // console.log(loggedIn);
   return (
     <View
       style={{
@@ -151,11 +183,27 @@ const HomeScreen = ({navigation}) => {
                     fontSize: 15,
                     fontWeight: '700',
                     textTransform: 'uppercase',
-                  }}
-                  onPress={() => getlocation()}>
+                  }}>
                   {loggedIn?.user?.firstName &&
                     loggedIn?.user?.firstName + ' ' + loggedIn?.user.lastName}
                 </Text>
+                <View style={{flexDirection: 'row'}}>
+                  <Image
+                    source={PlaceMarker}
+                    resizeMode="contain"
+                    style={{
+                      width: 20,
+                      height: 20,
+                      aspectRatio: 1,
+                      marginTop: 0,
+                      marginRight: 5,
+                    }}
+                  />
+                  <Text style={{color: '#fff'}}>
+                    {currentLocation && currentLocation}
+                  </Text>
+                </View>
+                {/* <Text>{LocationLong && LocationLong.speed} </Text> */}
               </View>
               <Pressable onPress={() => logOut()} style={{marginLeft: 'auto'}}>
                 <Image

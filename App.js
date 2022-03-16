@@ -44,6 +44,7 @@ const App: () => Node = () => {
   const [OTP, setOtp] = useState(false);
   const [animating, setAnimating] = useState(true);
   const [location, setLocation] = useState(true);
+  const [loggedinUser, setloggedinUser] = useState(null);
   const backgroundStyle = {
     backgroundColor: isDarkMode ? '#ffff' : '#ffff',
     height: '100%',
@@ -57,10 +58,15 @@ const App: () => Node = () => {
   const Stack = createNativeStackNavigator();
 
   const isLogged = async () => {
-    const loggedIn = await AsyncStorage.getItem('isLoggedIn');
-    if (loggedIn == '1') {
+    const loggedIna = await AsyncStorage.getItem('isLoggedIn');
+    const loggedUserData = await AsyncStorage.getItem('UserData');
+    if (loggedIna == '1') {
       setLoggedIn(true);
+      setloggedinUser(JSON.parse(loggedUserData));
       if (auth.user.valid == 'true') {
+        setOtp(true);
+      }
+      if (loggedinUser.user.valid == 'true') {
         setOtp(true);
       }
     } else {
@@ -70,11 +76,16 @@ const App: () => Node = () => {
 
   const isOTPValid = async () => {
     const otp = await AsyncStorage.getItem('OTP');
+    const loggedUserData = await AsyncStorage.getItem('UserData');
     console.log('opttttttpppppppppp', otp);
     if (otp == 'valid') {
+      setloggedinUser(JSON.parse(loggedUserData));
       setOtp(true);
     }
     if (auth.user.valid == 'true') {
+      setOtp(true);
+    }
+    if (loggedinUser.user.valid == 'true') {
       setOtp(true);
     } else {
       setOtp(false);
@@ -135,7 +146,7 @@ const App: () => Node = () => {
   if (animating) {
     return <SplashScreen />;
   }
-  console.log('{OTP', otpData?.verifyStatus?.status);
+  // console.log('{OTP', loggedinUser);
 
   // useEffect(() => {
 

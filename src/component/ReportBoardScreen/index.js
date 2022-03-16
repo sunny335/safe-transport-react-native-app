@@ -33,11 +33,13 @@ import image1 from '../image/loginBg.png';
 import {launchImageLibrary} from 'react-native-image-picker';
 import {updatePost, getPosts} from '../actions';
 import {CreateReport} from '../actions/report.action';
+import Geocoder from 'react-native-geocoding';
+import GetLocation from 'react-native-get-location';
 // import profile from '../image/profile.jpg';
 import avatar from '../image/avatar.png';
 import DoubleRight from '../image/DoubleRight.png';
 import done from '../image/done.png';
-
+import PlaceMarker from '../image/PlaceMarker.png';
 import HomeImg from '../image/Home.png';
 import ProfileImg from '../image/profileicon.png';
 import QrCode from '../image/QrCode.png';
@@ -63,6 +65,8 @@ const ReportBoardScreen = ({navigation}) => {
   const isDarkMode = useColorScheme() === 'dark';
   const dispatch = useDispatch();
   const [QrData, setQrData] = useState({posts: []});
+  const [LocationLong, setLocationLong] = useState(null);
+  const [currentLocation, setcurrentLocation] = useState(null);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [BusownerImage, setBusownerImage] = useState({
     avatarSource: null,
@@ -72,6 +76,32 @@ const ReportBoardScreen = ({navigation}) => {
     backgroundColor: isDarkMode ? '#ffff' : '#ffff',
   };
 
+  Geocoder.init('AIzaSyAQdhc-Oy-IITFz_AgsWXv1WrT4c0cdzek');
+
+  const handleLocation = () => {
+    GetLocation.getCurrentPosition({
+      enableHighAccuracy: false,
+      timeout: 30000,
+    })
+      .then(location => {
+        Geocoder.from(location?.latitude, location?.longitude)
+          .then(json => {
+            var addressComponent = json.results[0].formatted_address;
+            // console.log('dfgfd', addressComponent);
+            setLocationLong(location);
+            setcurrentLocation(addressComponent);
+          })
+          .catch(error => console.warn(error));
+      })
+      .catch(error => {
+        const {code, message} = error;
+        console.warn(code, message);
+      });
+  };
+
+  useEffect(() => {
+    handleLocation();
+  }, []);
   const userFormLogin = async () => {
     const loggedIna = await AsyncStorage.getItem('UserData');
     setLoggedIn(JSON.parse(loggedIna));
@@ -223,12 +253,13 @@ const ReportBoardScreen = ({navigation}) => {
           ReportedBusInfo: QrbackendData,
           reportedPhoto: BusownerImage.avatarSource,
           ReportType: selectedValue,
+          ReporterLocation: currentLocation,
         }),
       );
     }
   };
 
-  let mainContainerHeight = HEIGHT - (320 + keyboardHeight);
+  let mainContainerHeight = HEIGHT - (330 + keyboardHeight);
 
   return (
     <View
@@ -305,11 +336,11 @@ const ReportBoardScreen = ({navigation}) => {
           </View>
         </Modal>
       )}
-      <View contentInsetAdjustmentBehavior="automatic" style={{height: 320}}>
+      <View contentInsetAdjustmentBehavior="automatic" style={{height: 330}}>
         <ImageBackground
           source={image1}
           resizeMode="cover"
-          style={{height: 320}}>
+          style={{height: 330}}>
           <View style={{marginLeft: 20, marginRight: 53}}>
             <View
               style={{
@@ -360,6 +391,22 @@ const ReportBoardScreen = ({navigation}) => {
                   {loggedIn?.user?.firstName &&
                     loggedIn?.user?.firstName + ' ' + loggedIn?.user?.lastName}
                 </Text>
+                <View style={{flexDirection: 'row'}}>
+                  <Image
+                    source={PlaceMarker}
+                    resizeMode="contain"
+                    style={{
+                      width: 20,
+                      height: 20,
+                      aspectRatio: 1,
+                      marginTop: 0,
+                      marginRight: 5,
+                    }}
+                  />
+                  <Text style={{color: '#fff'}}>
+                    {currentLocation && currentLocation}
+                  </Text>
+                </View>
               </View>
             </View>
           </View>
