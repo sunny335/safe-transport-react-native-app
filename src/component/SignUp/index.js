@@ -143,6 +143,8 @@ const Index = ({navigation, setLoggedIns}) => {
       if (auth.user.valid == 'false') {
         dispatch(userVerifyAndSign(phone));
         dispatch(UserloginRequesr(phone));
+      } else {
+        AsyncStorage.setItem('OTP', 'valid');
       }
 
       console.log('============d', phone);
@@ -399,6 +401,7 @@ const Index = ({navigation, setLoggedIns}) => {
                     type="password"
                     error={errors?.loginpassword}
                     errorText={errors?.loginpassword?.message}
+                    secureTextEntry={true}
                   />
                 )}
               />
@@ -597,6 +600,7 @@ const Index = ({navigation, setLoggedIns}) => {
                     placeholder="password"
                     error={errors?.password}
                     errorText={errors?.password?.message}
+                    secureTextEntry={true}
                   />
                 )}
               />
