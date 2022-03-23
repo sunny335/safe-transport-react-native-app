@@ -20,7 +20,7 @@ import {
   Pressable,
   Image,
 } from 'react-native';
-
+import SplashScreen from '../SplashScreen/SplashScreen';
 import {useDispatch, useSelector} from 'react-redux';
 import {
   userSignup,
@@ -185,10 +185,14 @@ const Index = ({navigation, setLoggedIns}) => {
     return matches?.length || 'String is not a number';
   };
 
+  if (modalVisible) {
+    return <SplashScreen />;
+  }
+
   return (
     <>
       <StatusBar barStyle={isDarkMode ? '#fff' : 'dark-content'} />
-      {modalVisible && (
+      {/* {modalVisible && (
         <Modal
           animationType="slide"
           transparent={true}
@@ -225,7 +229,7 @@ const Index = ({navigation, setLoggedIns}) => {
             </View>
           </View>
         </Modal>
-      )}
+      )} */}
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"
         style={backgroundStyle}>

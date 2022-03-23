@@ -45,7 +45,7 @@ import Emergency from '../image/emergency.png';
 import Delete from '../image/delete.png';
 import PlaceMarker from '../image/PlaceMarker.png';
 import DoubleRight from '../image/DoubleRight.png';
-
+import refreshIcon from '../image/refresh.png';
 import HomeImg from '../image/homedefault.png';
 import ProfileImg from '../image/useactive.png';
 import Vector from '../image/Vector.png';
@@ -491,6 +491,21 @@ const EmergencyContactScreen = ({navigation}) => {
                   </Text>
                 </View>
               </View>
+              <Pressable
+                style={{marginLeft: 'auto'}}
+                onPress={() => setrefresh(!refresh)}>
+                <Image
+                  source={refreshIcon}
+                  resizeMode="contain"
+                  style={{
+                    width: 20,
+                    height: 20,
+                    aspectRatio: 1,
+                    marginTop: 10,
+                    marginLeft: 'auto',
+                  }}
+                />
+              </Pressable>
             </View>
           </View>
           <View>

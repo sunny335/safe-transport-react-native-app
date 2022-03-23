@@ -18,6 +18,7 @@ import {
   TouchableOpacity,
   Separator,
   ToastAndroid,
+  Pressable,
 } from 'react-native';
 import {t} from 'react-native-tailwindcss';
 import {useDispatch, useSelector} from 'react-redux';
@@ -32,7 +33,10 @@ import DoubleRight from '../image/DoubleRight.png';
 import HomeImg from '../image/Home.png';
 import ProfileImg from '../image/profileicon.png';
 import QrCode from '../image/QrCode.png';
+import refreshIcon from '../image/refresh.png';
+
 import {getPosts} from '../actions';
+
 const HEIGHT = Dimensions.get('window').height;
 const WIDTH = Dimensions.get('window').width;
 
@@ -42,6 +46,7 @@ const GeneratedQr = ({navigation}) => {
   const isDarkMode = useColorScheme() === 'dark';
   const [loggedIn, setLoggedIn] = useState({});
   const [QrData, setQrData] = useState({posts: []});
+  const [refresh, setrefresh] = useState(false);
   const dispatch = useDispatch();
   const backgroundStyle = {
     backgroundColor: isDarkMode ? '#ffff' : '#ffff',
@@ -59,7 +64,7 @@ const GeneratedQr = ({navigation}) => {
   useEffect(() => {
     dispatch(getPosts());
     setQrData(posts.posts);
-  }, []);
+  }, [refresh]);
 
   const saveQrToDisk = data => {
     var image_data = data.split('data:image/png;base64,');
@@ -213,17 +218,39 @@ const GeneratedQr = ({navigation}) => {
             height: HEIGHT - 330,
             maxHeight: HEIGHT - 330,
           }}>
-          <Text
-            style={[
-              t.textBlack,
-              t.textBase,
-              t.fontBold,
-              t.mB2,
-              t.mT1,
-              {marginLeft: 37, marginRight: 37},
-            ]}>
-            View All Generated Qr
-          </Text>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              paddingRight: 40,
+            }}>
+            <Text
+              style={[
+                t.textBlack,
+                t.textBase,
+                t.fontBold,
+                t.mB2,
+                t.mT1,
+                {marginLeft: 37, marginRight: 37},
+              ]}>
+              View All Generated Qr
+            </Text>
+            <Pressable
+              style={{marginLeft: 'auto'}}
+              onPress={() => setrefresh(!refresh)}>
+              <Image
+                source={refreshIcon}
+                resizeMode="contain"
+                style={{
+                  width: 20,
+                  height: 20,
+                  aspectRatio: 1,
+                  marginTop: 0,
+                  marginLeft: 'auto',
+                }}
+              />
+            </Pressable>
+          </View>
           <ScrollView style={{width: '100%'}}>
             <View
               style={[

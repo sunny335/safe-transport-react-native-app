@@ -15,19 +15,21 @@ import {
   ImageBackground,
   Image,
   Dimensions,
+  Pressable,
 } from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
+import axios from 'axios';
 
 import image1 from '../image/loginBg.png';
 // import profile from '../image/profile.jpg';
 import avatar from '../image/avatar.png';
 import DoubleRight from '../image/DoubleRight.png';
-
 import HomeImg from '../image/Home.png';
 import ProfileImg from '../image/profileicon.png';
 import QrCode from '../image/QrCode.png';
 import {getPosts} from '../actions/report.action';
+import refreshIcon from '../image/refresh.png';
 import {color} from 'react-native-reanimated';
 const HEIGHT = Dimensions.get('window').height;
 
@@ -37,6 +39,7 @@ const Index = ({navigation}) => {
   const [loggedIn, setLoggedIn] = useState({});
   const posts = useSelector(state => state.reports);
   const [Report, setReport] = useState({posts: []});
+  const [refresh, setrefresh] = useState(false);
   const dispatch = useDispatch();
   const backgroundStyle = {
     backgroundColor: isDarkMode ? '#ffff' : '#ffff',
@@ -52,8 +55,14 @@ const Index = ({navigation}) => {
 
   useEffect(() => {
     dispatch(getPosts());
+    // axios
+    //   .get('http://safetransport-backend.herokuapp.com/api/getReportData')
+    //   .then(res => {
+    //     const persons = res;
+    //     setReport(persons?.data);
+    //   });
     setReport(posts.posts);
-  }, []);
+  }, [refresh]);
 
   let ReportbackendData = [];
   ReportbackendData =
@@ -161,8 +170,8 @@ const Index = ({navigation}) => {
         }}>
         <View
           style={{
-            marginLeft: 37,
-            marginRight: 37,
+            marginLeft: 20,
+            marginRight: 20,
             // marginBottom: 30,
             shadowColor: '#000',
             shadowOffset: {width: 15, height: 15},
@@ -176,10 +185,31 @@ const Index = ({navigation}) => {
           }}>
           <ScrollView>
             <View>
-              <Text
-                style={{color: '#263238', fontWeight: '700', marginBottom: 14}}>
-                My Reports
-              </Text>
+              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <Text
+                  style={{
+                    color: '#263238',
+                    fontWeight: '700',
+                    marginBottom: 14,
+                  }}>
+                  My Reports
+                </Text>
+                <Pressable
+                  style={{marginLeft: 'auto'}}
+                  onPress={() => setrefresh(!refresh)}>
+                  <Image
+                    source={refreshIcon}
+                    resizeMode="contain"
+                    style={{
+                      width: 20,
+                      height: 20,
+                      aspectRatio: 1,
+                      marginTop: 0,
+                      marginLeft: 'auto',
+                    }}
+                  />
+                </Pressable>
+              </View>
               {ReportbackendData.length > 0 ? (
                 <View
                   style={{
@@ -189,11 +219,32 @@ const Index = ({navigation}) => {
                     alignItems: 'center',
                     padding: 6,
                   }}>
-                  <Text style={{width: '33.33%', color: '#fff'}}>Bus Name</Text>
-                  <Text style={{width: '33.33%', color: '#fff'}}>
+                  <Text
+                    style={{width: '25%', color: '#fff', fontWeight: '500'}}>
+                    Bus Name
+                  </Text>
+                  <Text
+                    style={{width: '25%', color: '#fff', fontWeight: '500'}}>
                     Bus Number
                   </Text>
-                  <Text style={{width: '33.33%', color: '#fff'}}>Date</Text>
+                  <Text
+                    style={{
+                      width: '25%',
+                      color: '#fff',
+                      textAlign: 'center',
+                      fontWeight: '500',
+                    }}>
+                    Date
+                  </Text>
+                  <Text
+                    style={{
+                      width: '25%',
+                      color: '#fff',
+                      textAlign: 'right',
+                      fontWeight: '500',
+                    }}>
+                    Status
+                  </Text>
                 </View>
               ) : (
                 <Text>You have not created any report yet</Text>
@@ -213,18 +264,46 @@ const Index = ({navigation}) => {
                     {item?.ReportedBusInfo
                       ? item.ReportedBusInfo.map(items => (
                           <>
-                            <Text style={{width: '33.33%', color: '#000000'}}>
+                            <Text
+                              style={{
+                                width: '25%',
+                                color: '#000000',
+                                fontWeight: '500',
+                              }}>
                               {items.name}
                             </Text>
-                            <Text style={{width: '33.33%', color: '#000000'}}>
+                            <Text
+                              style={{
+                                width: '25%',
+                                color: '#000000',
+                                fontWeight: '500',
+                              }}>
                               {items.busNumber}
                             </Text>
                           </>
                         ))
                       : null}
 
-                    <Text style={{width: '33.33%', color: '#000000'}}>
+                    <Text
+                      style={{
+                        width: '25%',
+                        color: '#000000',
+                        textAlign: 'right',
+                        fontWeight: '500',
+                      }}>
                       {item.createdAt.split('T')[0]}
+                    </Text>
+                    <Text
+                      style={{
+                        width: '25%',
+                        color:
+                          (item.ReportStatus == 'Active' && '#FF004D') ||
+                          (item.ReportStatus == 'Processing' && '#0695E3') ||
+                          (item.ReportStatus == 'Complete' && '#27AE60'),
+                        textAlign: 'right',
+                        fontWeight: '500',
+                      }}>
+                      {item.ReportStatus}
                     </Text>
                   </View>
                 ))}
